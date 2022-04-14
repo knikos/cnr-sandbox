@@ -96,7 +96,7 @@ func (lt *localTestFlagCheckProcessCreator) NewNodeProcess(config node.Config, f
 func newMockAPISuccessful(ipAddr string, port uint16) api.Client {
 	healthReply := &health.APIHealthReply{Healthy: true}
 	healthClient := &apimocks.HealthClient{}
-	healthClient.On("Health", mock.Anything).Return(healthReply, nil)
+	healthClient.On("Health", mock.Anything, mock.Anything).Return(healthReply, nil)
 	// ethClient used when removing nodes, to close websocket connection
 	ethClient := &apimocks.EthClient{}
 	ethClient.On("Close").Return()
@@ -110,7 +110,7 @@ func newMockAPISuccessful(ipAddr string, port uint16) api.Client {
 func newMockAPIUnhealthy(ipAddr string, port uint16) api.Client {
 	healthReply := &health.APIHealthReply{Healthy: false}
 	healthClient := &apimocks.HealthClient{}
-	healthClient.On("Health", mock.Anything).Return(healthReply, nil)
+	healthClient.On("Health", mock.Anything, mock.Anything).Return(healthReply, nil)
 	client := &apimocks.Client{}
 	client.On("HealthAPI").Return(healthClient)
 	return client

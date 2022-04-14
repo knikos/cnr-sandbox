@@ -17,6 +17,7 @@ import (
 	context "context"
 
 	health "github.com/chain4travel/caminogo/api/health"
+	rpc "github.com/chain4travel/caminogo/utils/rpc"
 	mock "github.com/stretchr/testify/mock"
 
 	time "time"
@@ -27,9 +28,9 @@ type HealthClient struct {
 	mock.Mock
 }
 
-// AwaitHealthy provides a mock function with given fields: ctx, freq
-func (_m *HealthClient) AwaitHealthy(ctx context.Context, freq time.Duration) (bool, error) {
-	ret := _m.Called(ctx, freq)
+// AwaitHealthy provides a mock function with given fields: ctx, freq, options
+func (_m *HealthClient) AwaitHealthy(ctx context.Context, freq time.Duration, options ...rpc.Option) (bool, error) {
+	ret := _m.Called(ctx, freq, options)
 
 	var r0 bool
 	if rf, ok := ret.Get(0).(func(context.Context, time.Duration) bool); ok {
@@ -48,9 +49,9 @@ func (_m *HealthClient) AwaitHealthy(ctx context.Context, freq time.Duration) (b
 	return r0, r1
 }
 
-// Health provides a mock function with given fields: _a0
-func (_m *HealthClient) Health(_a0 context.Context) (*health.APIHealthReply, error) {
-	ret := _m.Called(_a0)
+// Health provides a mock function with given fields: _a0, _a1
+func (_m *HealthClient) Health(_a0 context.Context, _a1 ...rpc.Option) (*health.APIHealthReply, error) {
+	ret := _m.Called(_a0, _a1)
 
 	var r0 *health.APIHealthReply
 	if rf, ok := ret.Get(0).(func(context.Context) *health.APIHealthReply); ok {
@@ -71,9 +72,9 @@ func (_m *HealthClient) Health(_a0 context.Context) (*health.APIHealthReply, err
 	return r0, r1
 }
 
-// Liveness provides a mock function with given fields: _a0
-func (_m *HealthClient) Liveness(_a0 context.Context) (*health.APIHealthReply, error) {
-	ret := _m.Called(_a0)
+// Liveness provides a mock function with given fields: _a0, _a1
+func (_m *HealthClient) Liveness(_a0 context.Context, _a1 ...rpc.Option) (*health.APIHealthReply, error) {
+	ret := _m.Called(_a0, _a1)
 
 	var r0 *health.APIHealthReply
 	if rf, ok := ret.Get(0).(func(context.Context) *health.APIHealthReply); ok {
@@ -94,9 +95,9 @@ func (_m *HealthClient) Liveness(_a0 context.Context) (*health.APIHealthReply, e
 	return r0, r1
 }
 
-// Readiness provides a mock function with given fields: _a0
-func (_m *HealthClient) Readiness(_a0 context.Context) (*health.APIHealthReply, error) {
-	ret := _m.Called(_a0)
+// Readiness provides a mock function with given fields: _a0, _a1
+func (_m *HealthClient) Readiness(_a0 context.Context, _a1 ...rpc.Option) (*health.APIHealthReply, error) {
+	ret := _m.Called(_a0, _a1)
 
 	var r0 *health.APIHealthReply
 	if rf, ok := ret.Get(0).(func(context.Context) *health.APIHealthReply); ok {

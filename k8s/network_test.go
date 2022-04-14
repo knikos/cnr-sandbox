@@ -159,12 +159,12 @@ func newDNSChecker() *mocks.DnsReachableChecker {
 func newMockAPISuccessful(ipAddr string, port uint16) api.Client {
 	healthReply := &health.APIHealthReply{Healthy: true}
 	healthClient := &apimocks.HealthClient{}
-	healthClient.On("Health", mock.Anything).Return(healthReply, nil)
+	healthClient.On("Health", mock.Anything, mock.Anything).Return(healthReply, nil)
 
 	id := ids.GenerateTestShortID().String()
 	infoReply := fmt.Sprintf("%s%s", constants.NodeIDPrefix, id)
 	infoClient := &apimocks.InfoClient{}
-	infoClient.On("GetNodeID", mock.Anything).Return(infoReply, nil)
+	infoClient.On("GetNodeID", mock.Anything, mock.Anything).Return(infoReply, nil)
 
 	client := &apimocks.Client{}
 	client.On("HealthAPI").Return(healthClient)
@@ -176,7 +176,7 @@ func newMockAPISuccessful(ipAddr string, port uint16) api.Client {
 func newMockAPIUnhealthy(ipAddr string, port uint16) api.Client {
 	healthReply := &health.APIHealthReply{Healthy: false}
 	healthClient := &apimocks.HealthClient{}
-	healthClient.On("Health", mock.Anything).Return(healthReply, nil)
+	healthClient.On("Health", mock.Anything, mock.Anything).Return(healthReply, nil)
 	client := &apimocks.Client{}
 	client.On("HealthAPI").Return(healthClient)
 	return client
