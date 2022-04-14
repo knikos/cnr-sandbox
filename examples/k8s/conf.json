@@ -7,7 +7,7 @@
     {
       "namespace": "ci-caminogo",
       "identifier": "caminogo-test-validator-0",
-      "kind": "Avalanchego",
+      "kind": "Caminogo",
       "apiVersion": "chain.avax.network/v1alpha1",
       "image": "avaplatform/caminogo",
       "tag": "v1.6.4"
@@ -15,7 +15,7 @@
     {
       "namespace": "ci-caminogo",
       "identifier": "caminogo-test-validator-1",
-      "kind": "Avalanchego",
+      "kind": "Caminogo",
       "apiVersion": "chain.avax.network/v1alpha1",
       "image": "avaplatform/caminogo",
       "tag": "v1.6.4"
@@ -23,7 +23,7 @@
     {
       "namespace": "ci-caminogo",
       "identifier": "caminogo-test-validator-2",
-      "kind": "Avalanchego",
+      "kind": "Caminogo",
       "apiVersion": "chain.avax.network/v1alpha1",
       "image": "avaplatform/caminogo",
       "tag": "v1.6.4"
@@ -31,7 +31,7 @@
     {
       "namespace": "ci-caminogo",
       "identifier": "caminogo-test-validator-3",
-      "kind": "Avalanchego",
+      "kind": "Caminogo",
       "apiVersion": "chain.avax.network/v1alpha1",
       "image": "avaplatform/caminogo",
       "tag": "v1.6.4"
@@ -39,7 +39,7 @@
     {
       "namespace": "ci-caminogo",
       "identifier": "caminogo-test-validator-4",
-      "kind": "Avalanchego",
+      "kind": "Caminogo",
       "apiVersion": "chain.avax.network/v1alpha1",
       "image": "avaplatform/caminogo",
       "tag": "v1.6.4"

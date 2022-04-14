@@ -131,7 +131,7 @@ func newMockK8sClient() k8scli.Client {
 	client := &mocks.Client{}
 	client.On("Get", mock.Anything, mock.Anything, mock.Anything).Run(
 		func(args mock.Arguments) {
-			arg := args.Get(2).(*k8sapi.Avalanchego)
+			arg := args.Get(2).(*k8sapi.Caminogo)
 			arg.Status.NetworkMembersURI = []string{"localhost"}
 		}).Return(nil)
 	client.On("Delete", mock.Anything, mock.Anything, mock.Anything).Return(nil)
@@ -268,7 +268,7 @@ func TestNetworkDefault(t *testing.T) {
 			"chain.avax.network/v1alpha1",
 			"new-node",
 			"avaplatform/caminogo",
-			"Avalanchego",
+			"Caminogo",
 			"ci-network-runner",
 			"9.99.9999",
 		),
@@ -497,7 +497,7 @@ func defaultTestNetworkConfig(t *testing.T) network.Config {
 		assert.NoError(err)
 		nodeConfig := node.Config{
 			Name:               fmt.Sprintf("node%d", i),
-			ImplSpecificConfig: utils.NewK8sNodeConfigJsonRaw("0.00.0000", fmt.Sprintf("testnode-%d", i), "somerepo/someimage", "Avalanchego", "ci-networkrunner", "testingversion"),
+			ImplSpecificConfig: utils.NewK8sNodeConfigJsonRaw("0.00.0000", fmt.Sprintf("testnode-%d", i), "somerepo/someimage", "Caminogo", "ci-networkrunner", "testingversion"),
 			StakingKey:         string(key),
 			StakingCert:        string(crt),
 		}

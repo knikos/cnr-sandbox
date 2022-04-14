@@ -86,7 +86,7 @@ func TestCreateDeploymentConfig(t *testing.T) {
 				"v1",
 				"test11",
 				"img1",
-				"Avalanchego",
+				"Caminogo",
 				"test01",
 				"t1",
 			),
@@ -101,7 +101,7 @@ func TestCreateDeploymentConfig(t *testing.T) {
 				"v2",
 				"test22",
 				"img2",
-				"Avalanchego",
+				"Caminogo",
 				"test02",
 				"t2",
 			),
@@ -124,8 +124,8 @@ func TestCreateDeploymentConfig(t *testing.T) {
 
 	assert.Equal(b.Name, "test11")
 	assert.Equal(n.Name, "test22")
-	assert.Equal(b.Kind, "Avalanchego")
-	assert.Equal(n.Kind, "Avalanchego")
+	assert.Equal(b.Kind, "Caminogo")
+	assert.Equal(n.Kind, "Caminogo")
 	assert.Equal(b.APIVersion, "v1")
 	assert.Equal(n.APIVersion, "v2")
 	assert.Equal(b.Namespace, "test01")

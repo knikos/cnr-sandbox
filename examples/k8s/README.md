@@ -10,7 +10,7 @@ environments.
 This README is *solely* about the kubernetes environment.
 
 ## Overview
-Avalanchego is a *stateful* application: It requires a DB and runs with an identity (NodeID).
+Caminogo is a *stateful* application: It requires a DB and runs with an identity (NodeID).
 Standard Kubernetes is best suited for *stateless* applications.
 
 To allow for stateful applications, the **Operator** pattern has been introduced into the kubernetes world [Operator pattern](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/).

@@ -97,7 +97,7 @@ func buildNodeEnv(log logging.Logger, genesis []byte, c node.Config) ([]corev1.E
 }
 
 // Takes a node's config and genesis and returns the node as a k8s object spec
-func buildK8sObjSpec(log logging.Logger, genesis []byte, c node.Config) (*k8sapi.Avalanchego, error) {
+func buildK8sObjSpec(log logging.Logger, genesis []byte, c node.Config) (*k8sapi.Caminogo, error) {
 	env, err := buildNodeEnv(log, genesis, c)
 	if err != nil {
 		return nil, err
@@ -117,7 +117,7 @@ func buildK8sObjSpec(log logging.Logger, genesis []byte, c node.Config) (*k8sapi
 		return nil, err
 	}
 
-	return &k8sapi.Avalanchego{
+	return &k8sapi.Caminogo{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       k8sConf.Kind,
 			APIVersion: k8sConf.APIVersion,
@@ -126,7 +126,7 @@ func buildK8sObjSpec(log logging.Logger, genesis []byte, c node.Config) (*k8sapi
 			Name:      k8sConf.Identifier,
 			Namespace: k8sConf.Namespace,
 		},
-		Spec: k8sapi.AvalanchegoSpec{
+		Spec: k8sapi.CaminogoSpec{
 			BootstrapperURL: "",
 			DeploymentName:  k8sConf.Identifier,
 			Image:           k8sConf.Image,
@@ -157,9 +157,9 @@ func validateObjectSpec(k8sobj ObjectSpec) error {
 		return errors.New("name should not be empty")
 	case k8sobj.APIVersion == "":
 		return errors.New("APIVersion should not be empty")
-	case k8sobj.Kind != "Avalanchego":
+	case k8sobj.Kind != "Caminogo":
 		// only "AvalancheGo" currently supported -- mandated by caminogo-operator
-		return fmt.Errorf("expected \"Avalanchego\" but got %q", k8sobj.Kind)
+		return fmt.Errorf("expected \"Caminogo\" but got %q", k8sobj.Kind)
 	case k8sobj.Namespace == "":
 		return errors.New("namespace should be defined to avoid unintended consequences")
 	case k8sobj.Image == "" || strings.Index(k8sobj.Image, "/") == 1:
@@ -174,7 +174,7 @@ func validateObjectSpec(k8sobj ObjectSpec) error {
 // 2) The non-beacon nodes
 // as caminogo-operator compatible descriptions.
 // May return nil slices.
-func createDeploymentFromConfig(params networkParams) ([]*k8sapi.Avalanchego, []*k8sapi.Avalanchego, error) {
+func createDeploymentFromConfig(params networkParams) ([]*k8sapi.Caminogo, []*k8sapi.Caminogo, error) {
 	// Give each flag in the network config to each node's config.
 	// If a flag is defined in both the network config and the node config,
 	// the value given in the node config takes precedence.
@@ -196,7 +196,7 @@ func createDeploymentFromConfig(params networkParams) ([]*k8sapi.Avalanchego, []
 		}
 	}
 
-	var beacons, nonBeacons []*k8sapi.Avalanchego
+	var beacons, nonBeacons []*k8sapi.Caminogo
 	names := make(map[string]struct{})
 	for _, nodeConfig := range params.conf.NodeConfigs {
 		spec, err := buildK8sObjSpec(params.log, []byte(params.conf.Genesis), nodeConfig)

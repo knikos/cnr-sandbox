@@ -275,7 +275,7 @@ func (a *networkImpl) AddNode(cfg node.Config) (node.Node, error) {
 	}
 
 	a.log.Debug("Launching new node %s to network...", cfg.Name)
-	if err := a.launchNodes([]*k8sapi.Avalanchego{nodeSpec}); err != nil {
+	if err := a.launchNodes([]*k8sapi.Caminogo{nodeSpec}); err != nil {
 		return nil, err
 	}
 
@@ -349,7 +349,7 @@ func (net *networkImpl) isStopped() bool {
 
 // Creates the given nodes and blocks until they're all reachable.
 // Assumes [a.nodesLock] isn't held.
-func (a *networkImpl) launchNodes(nodeSpecs []*k8sapi.Avalanchego) error {
+func (a *networkImpl) launchNodes(nodeSpecs []*k8sapi.Caminogo) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -368,7 +368,7 @@ func (a *networkImpl) launchNodes(nodeSpecs []*k8sapi.Avalanchego) error {
 
 // Create the given node in k8s and block until it's reachable.
 // Assumes [a.nodesLock] isn't held.
-func (a *networkImpl) launchNode(ctx context.Context, nodeSpec *k8sapi.Avalanchego) error {
+func (a *networkImpl) launchNode(ctx context.Context, nodeSpec *k8sapi.Caminogo) error {
 	ctx, cancel := context.WithTimeout(ctx, nodeReachableTimeout)
 	defer cancel()
 

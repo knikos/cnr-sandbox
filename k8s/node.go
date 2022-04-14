@@ -31,7 +31,7 @@ type ObjectSpec struct {
 	Tag        string `json:"tag"`        // The docker tag to use
 }
 
-// Node is a Avalanchego representation on k8s
+// Node is a Caminogo representation on k8s
 type Node struct {
 	// This node's AvalancheGo node ID
 	nodeID ids.ShortID
@@ -42,7 +42,7 @@ type Node struct {
 	// Use to send API calls to this node
 	apiClient api.Client
 	// K8s description of this node
-	k8sObjSpec *k8sapi.Avalanchego
+	k8sObjSpec *k8sapi.Caminogo
 }
 
 // See node.Node
@@ -78,6 +78,6 @@ func (n *Node) GetAPIPort() uint16 {
 
 // GetK8sObjSpec returns the kubernetes object spec
 // representation of this node
-func (n *Node) GetK8sObjSpec() *k8sapi.Avalanchego {
+func (n *Node) GetK8sObjSpec() *k8sapi.Caminogo {
 	return n.k8sObjSpec
 }
