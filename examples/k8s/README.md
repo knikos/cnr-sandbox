@@ -16,7 +16,7 @@ Standard Kubernetes is best suited for *stateless* applications.
 To allow for stateful applications, the **Operator** pattern has been introduced into the kubernetes world [Operator pattern](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/).
 
 This means that in order to successfully run an avalanchego network with this network runner tool on kubernetes, a "domain-specific" implementation of the pattern is required.
-This implementation can be found at [avalanchego-operator](https://github.com/ava-labs/avalanchego-operator).
+This implementation can be found at [avalanchego-operator](https://github.com/chain4travel/caminogo-operator).
 
 There only needs to be running **1 operator instance** per kubernetes namespace.
 Therefore it is very important to distinguish between:
@@ -63,7 +63,7 @@ To run a local kubernetes environment:
 4. Set the `$KUBECONFIG` environment variable to read the `k3s` environment: `export KUBECONFIG=/etc/rancher/k3s/k3s.yaml` (put this into your `.profile` or preferred environment persistance method). Make sure this variable is present in all terminals used for this tool.
 5. Run `kubectx` to check that the environment is fine (it should print `default` if there are no other kubernetes configs, otherwise, check the `kubectx` docs).
 6. **Run the avalanchego-operator locally**
-   6a. Clone the repository: `github.com/ava-labs/avalanchego-operator`
+   6a. Clone the repository: `github.com/chain4travel/caminogo-operator`
    6b. Run `make install` followed by `make run`. This should be everything needed.
 7. Install the service account, role and roleconfigs for the network runner pod: `kubectl apply -f examples/k8s/svc-rbac.yaml`.
 8. Build this app as a pod: `docker build -f ./examples/k8s/Dockerfile -t k8s-netrunner:alpha .`. If you use a different app name than `k8s-netrunner` and/or tag `alpha`, the `examples/k8s/simple-network-pod.yaml` file needs to be updated accordingly.

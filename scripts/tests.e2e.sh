@@ -28,13 +28,13 @@ echo VERSION_2: ${VERSION_2}
 
 ############################
 # download avalanchego
-# https://github.com/ava-labs/avalanchego/releases
+# https://github.com/chain4travel/caminogo/releases
 GOARCH=$(go env GOARCH)
 GOOS=$(go env GOOS)
-DOWNLOAD_URL=https://github.com/ava-labs/avalanchego/releases/download/v${VERSION_1}/avalanchego-linux-${GOARCH}-v${VERSION_1}.tar.gz
+DOWNLOAD_URL=https://github.com/chain4travel/caminogo/releases/download/v${VERSION_1}/avalanchego-linux-${GOARCH}-v${VERSION_1}.tar.gz
 DOWNLOAD_PATH=/tmp/avalanchego.tar.gz
 if [[ ${GOOS} == "darwin" ]]; then
-  DOWNLOAD_URL=https://github.com/ava-labs/avalanchego/releases/download/v${VERSION_1}/avalanchego-macos-v${VERSION_1}.zip
+  DOWNLOAD_URL=https://github.com/chain4travel/caminogo/releases/download/v${VERSION_1}/avalanchego-macos-v${VERSION_1}.zip
   DOWNLOAD_PATH=/tmp/avalanchego.zip
 fi
 
@@ -56,10 +56,10 @@ find /tmp/avalanchego-v${VERSION_1}
 
 ############################
 # download avalanchego
-# https://github.com/ava-labs/avalanchego/releases
-DOWNLOAD_URL=https://github.com/ava-labs/avalanchego/releases/download/v${VERSION_2}/avalanchego-linux-${GOARCH}-v${VERSION_2}.tar.gz
+# https://github.com/chain4travel/caminogo/releases
+DOWNLOAD_URL=https://github.com/chain4travel/caminogo/releases/download/v${VERSION_2}/avalanchego-linux-${GOARCH}-v${VERSION_2}.tar.gz
 if [[ ${GOOS} == "darwin" ]]; then
-  DOWNLOAD_URL=https://github.com/ava-labs/avalanchego/releases/download/v${VERSION_2}/avalanchego-macos-v${VERSION_2}.zip
+  DOWNLOAD_URL=https://github.com/chain4travel/caminogo/releases/download/v${VERSION_2}/avalanchego-macos-v${VERSION_2}.zip
   DOWNLOAD_PATH=/tmp/avalanchego.zip
 fi
 

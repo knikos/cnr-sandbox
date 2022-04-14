@@ -215,7 +215,7 @@ The network runs until the user provides a SIGINT or SIGTERM.
 
 It assumes:
 
-1. You have the latest AvalancheGo binaries at `$GOPATH/src/github.com/ava-labs/avalanchego/build`. For instructions on setting up AvalancheGo, see [here.](https://github.com/ava-labs/avalanchego)
+1. You have the latest AvalancheGo binaries at `$GOPATH/src/github.com/chain4travel/caminogo/build`. For instructions on setting up AvalancheGo, see [here.](https://github.com/chain4travel/caminogo)
 2. The network runner direcory is at `$GOPATH/src/github.com/ava-labs/avalanche-network-runner`.
 
 To run the demo:
@@ -270,13 +270,13 @@ To start the server:
 
 ```bash
 # replace with your local path
-curl -X POST -k http://localhost:8081/v1/control/start -d '{"execPath":"/Users/gyuho.lee/go/src/github.com/ava-labs/avalanchego/build/avalanchego","whitelistedSubnets":"24tZhrm8j8GCJRE9PomW8FaeqbgGS4UAQjJnqqn8pq5NwYSYV1","logLevel":"INFO"}'
+curl -X POST -k http://localhost:8081/v1/control/start -d '{"execPath":"/Users/gyuho.lee/go/src/github.com/chain4travel/caminogo/build/avalanchego","whitelistedSubnets":"24tZhrm8j8GCJRE9PomW8FaeqbgGS4UAQjJnqqn8pq5NwYSYV1","logLevel":"INFO"}'
 
 # or
 avalanche-network-runner control start \
 --log-level debug \
 --endpoint="0.0.0.0:8080" \
---avalanchego-path ${HOME}/go/src/github.com/ava-labs/avalanchego/build/avalanchego \
+--avalanchego-path ${HOME}/go/src/github.com/chain4travel/caminogo/build/avalanchego \
 --whitelisted-subnets="24tZhrm8j8GCJRE9PomW8FaeqbgGS4UAQjJnqqn8pq5NwYSYV1"
 ```
 
@@ -341,14 +341,14 @@ To restart a node, download the test binary:
 
 ```bash
 # [optional] download a binary to update
-# https://github.com/ava-labs/avalanchego/releases
+# https://github.com/chain4travel/caminogo/releases
 VERSION=1.7.3
 GOARCH=$(go env GOARCH)
 GOOS=$(go env GOOS)
-DOWNLOAD_URL=https://github.com/ava-labs/avalanchego/releases/download/v${VERSION}/avalanchego-linux-${GOARCH}-v${VERSION}.tar.gz
+DOWNLOAD_URL=https://github.com/chain4travel/caminogo/releases/download/v${VERSION}/avalanchego-linux-${GOARCH}-v${VERSION}.tar.gz
 DOWNLOAD_PATH=/tmp/avalanchego.tar.gz
 if [[ ${GOOS} == "darwin" ]]; then
-  DOWNLOAD_URL=https://github.com/ava-labs/avalanchego/releases/download/v${VERSION}/avalanchego-macos-v${VERSION}.zip
+  DOWNLOAD_URL=https://github.com/chain4travel/caminogo/releases/download/v${VERSION}/avalanchego-macos-v${VERSION}.zip
   DOWNLOAD_PATH=/tmp/avalanchego.zip
 fi
 
