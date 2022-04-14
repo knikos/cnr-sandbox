@@ -189,7 +189,7 @@ type Node interface {
 ### Download
 
 ```sh
-git clone https://github.com/ava-labs/camino-network-runner.git
+git clone https://github.com/chain4travel/camino-network-runner.git
 ```
 
 ### Run Unit Tests
@@ -216,7 +216,7 @@ The network runs until the user provides a SIGINT or SIGTERM.
 It assumes:
 
 1. You have the latest AvalancheGo binaries at `$GOPATH/src/github.com/chain4travel/caminogo/build`. For instructions on setting up AvalancheGo, see [here.](https://github.com/chain4travel/caminogo)
-2. The network runner direcory is at `$GOPATH/src/github.com/ava-labs/camino-network-runner`.
+2. The network runner direcory is at `$GOPATH/src/github.com/chain4travel/camino-network-runner`.
 
 To run the demo:
 
@@ -228,7 +228,7 @@ We've also included another example at `examples/local/fivenodenetwork/main.go`,
 
 ## `network-runner` RPC server
 
-**What does `network-runner` do?** The primary focus of [`network-runner`](https://github.com/ava-labs/camino-network-runner) is to create a local network, as a test framework for local development.
+**What does `network-runner` do?** The primary focus of [`network-runner`](https://github.com/chain4travel/camino-network-runner) is to create a local network, as a test framework for local development.
 
 **Why `network-runner` as a binary?** Previously, each team was still required to write a substantial amount of Go code to integrate with `network-runner`. And the circular dependency on `caminogo` made it unusable within `caminogo` itself. Using `network-runner` as a binary (rather than Go package) eliminates the complexity of such dependency management.
 
@@ -242,7 +242,7 @@ We've also included another example at `examples/local/fivenodenetwork/main.go`,
 
 ```bash
 # to install
-cd ${HOME}/go/src/github.com/ava-labs/camino-network-runner
+cd ${HOME}/go/src/github.com/chain4travel/camino-network-runner
 go install -v ./cmd/camino-network-runner
 ```
 

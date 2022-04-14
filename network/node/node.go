@@ -16,7 +16,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/ava-labs/camino-network-runner/api"
+	"github.com/chain4travel/camino-network-runner/api"
 	"github.com/chain4travel/caminogo/config"
 	"github.com/chain4travel/caminogo/ids"
 )

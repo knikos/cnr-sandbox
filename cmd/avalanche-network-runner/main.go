@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ava-labs/camino-network-runner/cmd/camino-network-runner/control"
-	"github.com/ava-labs/camino-network-runner/cmd/camino-network-runner/ping"
-	"github.com/ava-labs/camino-network-runner/cmd/camino-network-runner/server"
+	"github.com/chain4travel/camino-network-runner/cmd/camino-network-runner/control"
+	"github.com/chain4travel/camino-network-runner/cmd/camino-network-runner/ping"
+	"github.com/chain4travel/camino-network-runner/cmd/camino-network-runner/server"
 	"github.com/spf13/cobra"
 )
 

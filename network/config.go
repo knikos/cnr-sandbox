@@ -18,8 +18,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/ava-labs/camino-network-runner/network/node"
-	"github.com/ava-labs/camino-network-runner/utils"
+	"github.com/chain4travel/camino-network-runner/network/node"
+	"github.com/chain4travel/camino-network-runner/utils"
 	"github.com/chain4travel/caminogo/genesis"
 	"github.com/chain4travel/caminogo/ids"
 	"github.com/chain4travel/caminogo/utils/constants"

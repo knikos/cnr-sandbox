@@ -18,8 +18,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/ava-labs/camino-network-runner/network/node"
-	"github.com/ava-labs/camino-network-runner/utils"
+	"github.com/chain4travel/camino-network-runner/network/node"
+	"github.com/chain4travel/camino-network-runner/utils"
 	k8sapi "github.com/chain4travel/caminogo-operator/api/v1alpha1"
 	"github.com/chain4travel/caminogo/config"
 	"github.com/chain4travel/caminogo/utils/logging"

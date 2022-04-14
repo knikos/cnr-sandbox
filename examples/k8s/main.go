@@ -18,10 +18,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/ava-labs/camino-network-runner/k8s"
-	"github.com/ava-labs/camino-network-runner/network"
-	"github.com/ava-labs/camino-network-runner/network/node"
-	"github.com/ava-labs/camino-network-runner/utils"
+	"github.com/chain4travel/camino-network-runner/k8s"
+	"github.com/chain4travel/camino-network-runner/network"
+	"github.com/chain4travel/camino-network-runner/network/node"
+	"github.com/chain4travel/camino-network-runner/utils"
 	"github.com/chain4travel/caminogo/utils/logging"
 )
 
@@ -60,7 +60,7 @@ func run() error {
 		return err
 	}
 
-	configDir := fmt.Sprintf("%s/src/github.com/ava-labs/camino-network-runner/examples/k8s", goPath)
+	configDir := fmt.Sprintf("%s/src/github.com/chain4travel/camino-network-runner/examples/k8s", goPath)
 	if goPath == "" {
 		configDir = "./examples/k8s"
 	}

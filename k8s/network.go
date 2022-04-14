@@ -19,9 +19,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ava-labs/camino-network-runner/api"
-	"github.com/ava-labs/camino-network-runner/network"
-	"github.com/ava-labs/camino-network-runner/network/node"
+	"github.com/chain4travel/camino-network-runner/api"
+	"github.com/chain4travel/camino-network-runner/network"
+	"github.com/chain4travel/camino-network-runner/network/node"
 	"github.com/chain4travel/caminogo/ids"
 	"github.com/chain4travel/caminogo/utils/constants"
 	"github.com/chain4travel/caminogo/utils/logging"

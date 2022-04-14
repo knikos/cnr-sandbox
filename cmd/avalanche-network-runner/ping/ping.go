@@ -7,9 +7,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/ava-labs/camino-network-runner/client"
-	"github.com/ava-labs/camino-network-runner/pkg/color"
-	"github.com/ava-labs/camino-network-runner/pkg/logutil"
+	"github.com/chain4travel/camino-network-runner/client"
+	"github.com/chain4travel/camino-network-runner/pkg/color"
+	"github.com/chain4travel/camino-network-runner/pkg/logutil"
 	"github.com/spf13/cobra"
 )
 

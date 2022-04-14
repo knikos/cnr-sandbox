@@ -19,8 +19,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/ava-labs/camino-network-runner/local"
-	"github.com/ava-labs/camino-network-runner/network"
+	"github.com/chain4travel/camino-network-runner/local"
+	"github.com/chain4travel/camino-network-runner/network"
 	"github.com/chain4travel/caminogo/utils/logging"
 )
 

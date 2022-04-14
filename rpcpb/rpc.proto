@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "github.com/ava-labs/camino-network-runner;rpcpb";
+option go_package = "github.com/chain4travel/camino-network-runner;rpcpb";
 
 package rpcpb;
 

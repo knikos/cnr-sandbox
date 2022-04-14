@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/ava-labs/camino-network-runner/network/node"
+	"github.com/chain4travel/camino-network-runner/network/node"
 )
 
 var ErrStopped = errors.New("network stopped")

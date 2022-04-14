@@ -18,9 +18,9 @@ import (
 	"sync"
 
 	"github.com/chain4travel/caminogo/ids"
-	"github.com/ava-labs/coreth/core/types"
-	"github.com/ava-labs/coreth/ethclient"
-	"github.com/ava-labs/coreth/interfaces"
+	"github.com/chain4travel/coreth/core/types"
+	"github.com/chain4travel/coreth/ethclient"
+	"github.com/chain4travel/coreth/interfaces"
 	"github.com/ethereum/go-ethereum/common"
 )
 

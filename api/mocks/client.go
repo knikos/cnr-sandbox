@@ -14,12 +14,12 @@
 package mocks
 
 import (
-	api "github.com/ava-labs/camino-network-runner/api"
+	api "github.com/chain4travel/camino-network-runner/api"
 	admin "github.com/chain4travel/caminogo/api/admin"
 
 	avm "github.com/chain4travel/caminogo/vms/avm"
 
-	evm "github.com/ava-labs/coreth/plugin/evm"
+	evm "github.com/chain4travel/coreth/plugin/evm"
 
 	health "github.com/chain4travel/caminogo/api/health"
 

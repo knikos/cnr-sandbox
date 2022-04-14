@@ -11,8 +11,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/ava-labs/camino-network-runner/pkg/logutil"
-	"github.com/ava-labs/camino-network-runner/server"
+	"github.com/chain4travel/camino-network-runner/pkg/logutil"
+	"github.com/chain4travel/camino-network-runner/server"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 )

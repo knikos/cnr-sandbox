@@ -20,7 +20,7 @@ import (
 	"github.com/chain4travel/caminogo/indexer"
 	"github.com/chain4travel/caminogo/vms/avm"
 	"github.com/chain4travel/caminogo/vms/platformvm"
-	"github.com/ava-labs/coreth/plugin/evm"
+	"github.com/chain4travel/coreth/plugin/evm"
 )
 
 // Issues API calls to a node
