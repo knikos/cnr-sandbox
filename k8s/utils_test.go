@@ -62,7 +62,7 @@ func TestBuildNodeEnv(t *testing.T) {
 }
 
 // TestConvertKey tests the internal convertKey method which is used
-// to convert from the avalanchego config file format to env vars
+// to convert from the caminogo config file format to env vars
 func TestConvertKey(t *testing.T) {
 	testKey := "network-peer-list-gossip-frequency"
 	controlKey := "AVAGO_NETWORK_PEER_LIST_GOSSIP_FREQUENCY"

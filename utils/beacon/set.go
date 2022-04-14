@@ -23,7 +23,7 @@ import (
 	"github.com/chain4travel/caminogo/utils/constants"
 )
 
-// TODO: remove this in favor of an exported utility from avalanchego
+// TODO: remove this in favor of an exported utility from caminogo
 
 var (
 	_ Set = &set{}

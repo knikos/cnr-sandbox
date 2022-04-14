@@ -19,7 +19,7 @@ import (
 	"github.com/chain4travel/caminogo/utils"
 )
 
-// TODO: remove this in favor of an exported utility from avalanchego
+// TODO: remove this in favor of an exported utility from caminogo
 
 var _ Beacon = &beacon{}
 

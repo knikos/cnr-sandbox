@@ -158,7 +158,7 @@ func validateObjectSpec(k8sobj ObjectSpec) error {
 	case k8sobj.APIVersion == "":
 		return errors.New("APIVersion should not be empty")
 	case k8sobj.Kind != "Avalanchego":
-		// only "AvalancheGo" currently supported -- mandated by avalanchego-operator
+		// only "AvalancheGo" currently supported -- mandated by caminogo-operator
 		return fmt.Errorf("expected \"Avalanchego\" but got %q", k8sobj.Kind)
 	case k8sobj.Namespace == "":
 		return errors.New("namespace should be defined to avoid unintended consequences")
@@ -172,7 +172,7 @@ func validateObjectSpec(k8sobj ObjectSpec) error {
 // Takes the genesis of a network and node configs and returns:
 // 1) The beacon nodes
 // 2) The non-beacon nodes
-// as avalanchego-operator compatible descriptions.
+// as caminogo-operator compatible descriptions.
 // May return nil slices.
 func createDeploymentFromConfig(params networkParams) ([]*k8sapi.Avalanchego, []*k8sapi.Avalanchego, error) {
 	// Give each flag in the network config to each node's config.

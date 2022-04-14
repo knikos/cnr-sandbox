@@ -39,7 +39,7 @@ const (
 	nodeReachableTimeout = 2 * time.Minute
 	// Time between checks to see if a node is reachable
 	nodeReachableRetryFreq = 3 * time.Second
-	// Prefix the avalanchego-operator uses to pass params to avalanchego nodes
+	// Prefix the caminogo-operator uses to pass params to caminogo nodes
 	envVarPrefix = "AVAGO_"
 )
 

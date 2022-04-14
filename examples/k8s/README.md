@@ -15,8 +15,8 @@ Standard Kubernetes is best suited for *stateless* applications.
 
 To allow for stateful applications, the **Operator** pattern has been introduced into the kubernetes world [Operator pattern](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/).
 
-This means that in order to successfully run an avalanchego network with this network runner tool on kubernetes, a "domain-specific" implementation of the pattern is required.
-This implementation can be found at [avalanchego-operator](https://github.com/chain4travel/caminogo-operator).
+This means that in order to successfully run an caminogo network with this network runner tool on kubernetes, a "domain-specific" implementation of the pattern is required.
+This implementation can be found at [caminogo-operator](https://github.com/chain4travel/caminogo-operator).
 
 There only needs to be running **1 operator instance** per kubernetes namespace.
 Therefore it is very important to distinguish between:
@@ -30,7 +30,7 @@ Therefore it is very important to distinguish between:
 ### Github action
 If running in a cloud provided (for Ava Labs, typically AWS), then the **devops** team is responsible for setting up the required infrastructure.
 
-**Devops would be deploying the `avalanchego-operator`**.
+**Devops would be deploying the `caminogo-operator`**.
 
 
 The normal operation is to create a github action which triggers the deployment to the kubernetes cluster in the cloud. 
@@ -46,13 +46,13 @@ Usually there would be nothing else to be done for the deployment other than imp
 
 ### Without github action
 If a deployment without a github action should be required, then devops involvement is likewise required.
-They also would deploy the `avalanchego-operator` and provide necessary deployment information (namespace etc.).
+They also would deploy the `caminogo-operator` and provide necessary deployment information (namespace etc.).
 
 The network runner can then analogously be deployed either via self-contained pod or a `main` binary. Both need to have the required permissions.
 
 
 ## Local kubernetes environment
-Kubernetes can also be run locally. This is usually only needed for development. In fact, for "normal" avalanchego testing and work, it shouldn't be necessary to run a local kubernetes cluster. However, for developing the integration in this repository, it is highly recommended as it speeds up development time.
+Kubernetes can also be run locally. This is usually only needed for development. In fact, for "normal" caminogo testing and work, it shouldn't be necessary to run a local kubernetes cluster. However, for developing the integration in this repository, it is highly recommended as it speeds up development time.
 
 To run a local kubernetes environment:
 
@@ -62,7 +62,7 @@ To run a local kubernetes environment:
 3. Install `kubectx` to allow to set an easy default environment: [kubectx](https://github.com/ahmetb/kubectx)
 4. Set the `$KUBECONFIG` environment variable to read the `k3s` environment: `export KUBECONFIG=/etc/rancher/k3s/k3s.yaml` (put this into your `.profile` or preferred environment persistance method). Make sure this variable is present in all terminals used for this tool.
 5. Run `kubectx` to check that the environment is fine (it should print `default` if there are no other kubernetes configs, otherwise, check the `kubectx` docs).
-6. **Run the avalanchego-operator locally**
+6. **Run the caminogo-operator locally**
    6a. Clone the repository: `github.com/chain4travel/caminogo-operator`
    6b. Run `make install` followed by `make run`. This should be everything needed.
 7. Install the service account, role and roleconfigs for the network runner pod: `kubectl apply -f examples/k8s/svc-rbac.yaml`.

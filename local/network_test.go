@@ -509,7 +509,7 @@ func TestGeneratedNodesNames(t *testing.T) {
 }
 
 // TestGenerateDefaultNetwork create a default network with GenerateDefaultNetwork and
-// check expected number of nodes, node names, and avalanchego node ids
+// check expected number of nodes, node names, and caminogo node ids
 func TestGenerateDefaultNetwork(t *testing.T) {
 	assert := assert.New(t)
 	binaryPath := "pepito"

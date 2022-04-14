@@ -27,57 +27,57 @@ echo VERSION_1: ${VERSION_1}
 echo VERSION_2: ${VERSION_2}
 
 ############################
-# download avalanchego
+# download caminogo
 # https://github.com/chain4travel/caminogo/releases
 GOARCH=$(go env GOARCH)
 GOOS=$(go env GOOS)
-DOWNLOAD_URL=https://github.com/chain4travel/caminogo/releases/download/v${VERSION_1}/avalanchego-linux-${GOARCH}-v${VERSION_1}.tar.gz
-DOWNLOAD_PATH=/tmp/avalanchego.tar.gz
+DOWNLOAD_URL=https://github.com/chain4travel/caminogo/releases/download/v${VERSION_1}/caminogo-linux-${GOARCH}-v${VERSION_1}.tar.gz
+DOWNLOAD_PATH=/tmp/caminogo.tar.gz
 if [[ ${GOOS} == "darwin" ]]; then
-  DOWNLOAD_URL=https://github.com/chain4travel/caminogo/releases/download/v${VERSION_1}/avalanchego-macos-v${VERSION_1}.zip
-  DOWNLOAD_PATH=/tmp/avalanchego.zip
+  DOWNLOAD_URL=https://github.com/chain4travel/caminogo/releases/download/v${VERSION_1}/caminogo-macos-v${VERSION_1}.zip
+  DOWNLOAD_PATH=/tmp/caminogo.zip
 fi
 
-rm -rf /tmp/avalanchego-v${VERSION_1}
-rm -rf /tmp/avalanchego-build
+rm -rf /tmp/caminogo-v${VERSION_1}
+rm -rf /tmp/caminogo-build
 rm -f ${DOWNLOAD_PATH}
 
-echo "downloading avalanchego ${VERSION_1} at ${DOWNLOAD_URL}"
+echo "downloading caminogo ${VERSION_1} at ${DOWNLOAD_URL}"
 curl -L ${DOWNLOAD_URL} -o ${DOWNLOAD_PATH}
 
-echo "extracting downloaded avalanchego"
+echo "extracting downloaded caminogo"
 if [[ ${GOOS} == "linux" ]]; then
   tar xzvf ${DOWNLOAD_PATH} -C /tmp
 elif [[ ${GOOS} == "darwin" ]]; then
-  unzip ${DOWNLOAD_PATH} -d /tmp/avalanchego-build
-  mv /tmp/avalanchego-build/build /tmp/avalanchego-v${VERSION_1}
+  unzip ${DOWNLOAD_PATH} -d /tmp/caminogo-build
+  mv /tmp/caminogo-build/build /tmp/caminogo-v${VERSION_1}
 fi
-find /tmp/avalanchego-v${VERSION_1}
+find /tmp/caminogo-v${VERSION_1}
 
 ############################
-# download avalanchego
+# download caminogo
 # https://github.com/chain4travel/caminogo/releases
-DOWNLOAD_URL=https://github.com/chain4travel/caminogo/releases/download/v${VERSION_2}/avalanchego-linux-${GOARCH}-v${VERSION_2}.tar.gz
+DOWNLOAD_URL=https://github.com/chain4travel/caminogo/releases/download/v${VERSION_2}/caminogo-linux-${GOARCH}-v${VERSION_2}.tar.gz
 if [[ ${GOOS} == "darwin" ]]; then
-  DOWNLOAD_URL=https://github.com/chain4travel/caminogo/releases/download/v${VERSION_2}/avalanchego-macos-v${VERSION_2}.zip
-  DOWNLOAD_PATH=/tmp/avalanchego.zip
+  DOWNLOAD_URL=https://github.com/chain4travel/caminogo/releases/download/v${VERSION_2}/caminogo-macos-v${VERSION_2}.zip
+  DOWNLOAD_PATH=/tmp/caminogo.zip
 fi
 
-rm -rf /tmp/avalanchego-v${VERSION_2}
-rm -rf /tmp/avalanchego-build
+rm -rf /tmp/caminogo-v${VERSION_2}
+rm -rf /tmp/caminogo-build
 rm -f ${DOWNLOAD_PATH}
 
-echo "downloading avalanchego ${VERSION_2} at ${DOWNLOAD_URL}"
+echo "downloading caminogo ${VERSION_2} at ${DOWNLOAD_URL}"
 curl -L ${DOWNLOAD_URL} -o ${DOWNLOAD_PATH}
 
-echo "extracting downloaded avalanchego"
+echo "extracting downloaded caminogo"
 if [[ ${GOOS} == "linux" ]]; then
   tar xzvf ${DOWNLOAD_PATH} -C /tmp
 elif [[ ${GOOS} == "darwin" ]]; then
-  unzip ${DOWNLOAD_PATH} -d /tmp/avalanchego-build
-  mv /tmp/avalanchego-build/build /tmp/avalanchego-v${VERSION_2}
+  unzip ${DOWNLOAD_PATH} -d /tmp/caminogo-build
+  mv /tmp/caminogo-build/build /tmp/caminogo-v${VERSION_2}
 fi
-find /tmp/avalanchego-v${VERSION_2}
+find /tmp/caminogo-v${VERSION_2}
 
 ############################
 echo "building runner"
@@ -103,8 +103,8 @@ echo "running e2e tests"
 --log-level debug \
 --grpc-endpoint="0.0.0.0:8080" \
 --grpc-gateway-endpoint="0.0.0.0:8081" \
---avalanchego-path-1=/tmp/avalanchego-v${VERSION_1}/avalanchego \
---avalanchego-path-2=/tmp/avalanchego-v${VERSION_2}/avalanchego
+--caminogo-path-1=/tmp/caminogo-v${VERSION_1}/caminogo \
+--caminogo-path-2=/tmp/caminogo-v${VERSION_2}/caminogo
 
 kill -9 ${PID}
 echo "ALL SUCCESS!"

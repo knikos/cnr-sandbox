@@ -61,7 +61,7 @@ type ethClient struct {
 
 // NewEthClient mainly takes ip/port info for usage in future calls
 // Connection can't be initialized in constructor because node is not ready when the constructor is called
-// It follows convention of most avalanchego api constructors that can be called without having a ready node
+// It follows convention of most caminogo api constructors that can be called without having a ready node
 func NewEthClient(ipAddr string, port uint) EthClient {
 	return &ethClient{
 		ipAddr: ipAddr,

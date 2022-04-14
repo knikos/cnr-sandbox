@@ -40,7 +40,7 @@ type Node interface {
 	GetAPIPort() uint16
 }
 
-// Config encapsulates an avalanchego configuration
+// Config encapsulates an caminogo configuration
 type Config struct {
 	// Configuration specific to a particular implementation of a node.
 	ImplSpecificConfig json.RawMessage `json:"implSpecificConfig"`

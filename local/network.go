@@ -219,7 +219,7 @@ func NewNetwork(
 
 // See NewNetwork.
 // [newAPIClientF] is used to create new API clients.
-// [nodeProcessCreator] is used to launch new avalanchego processes.
+// [nodeProcessCreator] is used to launch new caminogo processes.
 func newNetwork(
 	log logging.Logger,
 	networkConfig network.Config,

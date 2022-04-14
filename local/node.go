@@ -64,7 +64,7 @@ func (p *nodeProcessImpl) Stop() error {
 	return p.cmd.Process.Signal(syscall.SIGTERM)
 }
 
-// Gives access to basic nodes info, and to most avalanchego apis
+// Gives access to basic nodes info, and to most caminogo apis
 type localNode struct {
 	// Must be unique across all nodes in this network.
 	name string

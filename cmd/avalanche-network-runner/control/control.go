@@ -66,9 +66,9 @@ func newStartCommand() *cobra.Command {
 	}
 	cmd.PersistentFlags().StringVar(
 		&avalancheGoBinPath,
-		"avalanchego-path",
+		"caminogo-path",
 		"",
-		"avalanchego binary path",
+		"caminogo binary path",
 	)
 	cmd.PersistentFlags().StringVar(
 		&whitelistedSubnets,
@@ -298,9 +298,9 @@ func newRestartNodeCommand() *cobra.Command {
 	)
 	cmd.PersistentFlags().StringVar(
 		&avalancheGoBinPath,
-		"avalanchego-path",
+		"caminogo-path",
 		"",
-		"avalanchego binary path",
+		"caminogo binary path",
 	)
 	cmd.PersistentFlags().StringVar(
 		&whitelistedSubnets,

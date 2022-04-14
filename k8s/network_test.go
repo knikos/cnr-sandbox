@@ -267,7 +267,7 @@ func TestNetworkDefault(t *testing.T) {
 		ImplSpecificConfig: utils.NewK8sNodeConfigJsonRaw(
 			"chain.avax.network/v1alpha1",
 			"new-node",
-			"avaplatform/avalanchego",
+			"avaplatform/caminogo",
 			"Avalanchego",
 			"ci-network-runner",
 			"9.99.9999",
