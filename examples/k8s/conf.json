@@ -9,7 +9,7 @@
       "identifier": "caminogo-test-validator-0",
       "kind": "Caminogo",
       "apiVersion": "chain.avax.network/v1alpha1",
-      "image": "avaplatform/caminogo",
+      "image": "caminoplatform/caminogo",
       "tag": "v1.6.4"
     },
     {
@@ -17,7 +17,7 @@
       "identifier": "caminogo-test-validator-1",
       "kind": "Caminogo",
       "apiVersion": "chain.avax.network/v1alpha1",
-      "image": "avaplatform/caminogo",
+      "image": "caminoplatform/caminogo",
       "tag": "v1.6.4"
     },
     {
@@ -25,7 +25,7 @@
       "identifier": "caminogo-test-validator-2",
       "kind": "Caminogo",
       "apiVersion": "chain.avax.network/v1alpha1",
-      "image": "avaplatform/caminogo",
+      "image": "caminoplatform/caminogo",
       "tag": "v1.6.4"
     },
     {
@@ -33,7 +33,7 @@
       "identifier": "caminogo-test-validator-3",
       "kind": "Caminogo",
       "apiVersion": "chain.avax.network/v1alpha1",
-      "image": "avaplatform/caminogo",
+      "image": "caminoplatform/caminogo",
       "tag": "v1.6.4"
     },
     {
@@ -41,7 +41,7 @@
       "identifier": "caminogo-test-validator-4",
       "kind": "Caminogo",
       "apiVersion": "chain.avax.network/v1alpha1",
-      "image": "avaplatform/caminogo",
+      "image": "caminoplatform/caminogo",
       "tag": "v1.6.4"
     }
   ]
