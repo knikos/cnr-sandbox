@@ -1,7 +1,7 @@
-# Kubernetes deployment of an avalanche network runner 
+# Kubernetes deployment of an camino network runner 
 
 ## Scope 
-The avalanche network runner can operate in 
+The camino network runner can operate in 
 * local
 * kubernetes
 

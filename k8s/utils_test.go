@@ -24,7 +24,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// TestBuildNodeEnv tests the internal buildNodeEnv method which creates the env vars for the avalanche nodes
+// TestBuildNodeEnv tests the internal buildNodeEnv method which creates the env vars for the camino nodes
 func TestBuildNodeEnv(t *testing.T) {
 	genesis := defaultTestGenesis
 	testConfig := `
