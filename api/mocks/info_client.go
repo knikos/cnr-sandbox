@@ -204,15 +204,15 @@ func (_m *InfoClient) IsBootstrapped(_a0 context.Context, _a1 string) (bool, err
 }
 
 // Peers provides a mock function with given fields: _a0
-func (_m *InfoClient) Peers(_a0 context.Context) ([]network.PeerInfo, error) {
+func (_m *InfoClient) Peers(_a0 context.Context) ([]network.PeerListGossipConfig, error) {
 	ret := _m.Called(_a0)
 
-	var r0 []network.PeerInfo
-	if rf, ok := ret.Get(0).(func(context.Context) []network.PeerInfo); ok {
+	var r0 []network.PeerListGossipConfig
+	if rf, ok := ret.Get(0).(func(context.Context) []network.PeerListGossipConfig); ok {
 		r0 = rf(_a0)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]network.PeerInfo)
+			r0 = ret.Get(0).([]network.PeerListGossipConfig)
 		}
 	}
 
