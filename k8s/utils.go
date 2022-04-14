@@ -1,3 +1,14 @@
+// Copyright (C) 2022, Chain4Travel AG. All rights reserved.
+//
+// This file is a derived work, based on ava-labs code whose
+// original notices appear below.
+//
+// It is distributed under the same license conditions as the
+// original code from which it is derived.
+//
+// Much love to the original authors for their work.
+// **********************************************************
+
 package k8s
 
 import (
@@ -9,9 +20,9 @@ import (
 
 	"github.com/ava-labs/avalanche-network-runner/network/node"
 	"github.com/ava-labs/avalanche-network-runner/utils"
-	k8sapi "github.com/ava-labs/avalanchego-operator/api/v1alpha1"
-	"github.com/ava-labs/avalanchego/config"
-	"github.com/ava-labs/avalanchego/utils/logging"
+	k8sapi "github.com/chain4travel/caminogo-operator/api/v1alpha1"
+	"github.com/chain4travel/caminogo/config"
+	"github.com/chain4travel/caminogo/utils/logging"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

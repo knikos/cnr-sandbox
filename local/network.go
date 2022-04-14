@@ -1,3 +1,14 @@
+// Copyright (C) 2022, Chain4Travel AG. All rights reserved.
+//
+// This file is a derived work, based on ava-labs code whose
+// original notices appear below.
+//
+// It is distributed under the same license conditions as the
+// original code from which it is derived.
+//
+// Much love to the original authors for their work.
+// **********************************************************
+
 package local
 
 import (
@@ -19,10 +30,10 @@ import (
 	"github.com/ava-labs/avalanche-network-runner/network/node"
 	"github.com/ava-labs/avalanche-network-runner/utils"
 	"github.com/ava-labs/avalanche-network-runner/utils/beacon"
-	"github.com/ava-labs/avalanchego/config"
-	avago_utils "github.com/ava-labs/avalanchego/utils"
-	"github.com/ava-labs/avalanchego/utils/logging"
-	"github.com/ava-labs/avalanchego/utils/wrappers"
+	"github.com/chain4travel/caminogo/config"
+	avago_utils "github.com/chain4travel/caminogo/utils"
+	"github.com/chain4travel/caminogo/utils/logging"
+	"github.com/chain4travel/caminogo/utils/wrappers"
 	"golang.org/x/sync/errgroup"
 )
 

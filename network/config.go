@@ -1,3 +1,14 @@
+// Copyright (C) 2022, Chain4Travel AG. All rights reserved.
+//
+// This file is a derived work, based on ava-labs code whose
+// original notices appear below.
+//
+// It is distributed under the same license conditions as the
+// original code from which it is derived.
+//
+// Much love to the original authors for their work.
+// **********************************************************
+
 package network
 
 import (
@@ -9,12 +20,12 @@ import (
 
 	"github.com/ava-labs/avalanche-network-runner/network/node"
 	"github.com/ava-labs/avalanche-network-runner/utils"
-	"github.com/ava-labs/avalanchego/genesis"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/utils/constants"
-	"github.com/ava-labs/avalanchego/utils/formatting"
-	"github.com/ava-labs/avalanchego/utils/logging"
-	"github.com/ava-labs/avalanchego/utils/units"
+	"github.com/chain4travel/caminogo/genesis"
+	"github.com/chain4travel/caminogo/ids"
+	"github.com/chain4travel/caminogo/utils/constants"
+	"github.com/chain4travel/caminogo/utils/formatting"
+	"github.com/chain4travel/caminogo/utils/logging"
+	"github.com/chain4travel/caminogo/utils/units"
 )
 
 var cChainConfig map[string]interface{}

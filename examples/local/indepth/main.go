@@ -1,3 +1,14 @@
+// Copyright (C) 2022, Chain4Travel AG. All rights reserved.
+//
+// This file is a derived work, based on ava-labs code whose
+// original notices appear below.
+//
+// It is distributed under the same license conditions as the
+// original code from which it is derived.
+//
+// Much love to the original authors for their work.
+// **********************************************************
+
 package main
 
 import (
@@ -12,9 +23,9 @@ import (
 	"github.com/ava-labs/avalanche-network-runner/network"
 	"github.com/ava-labs/avalanche-network-runner/network/node"
 	"github.com/ava-labs/avalanche-network-runner/utils"
-	"github.com/ava-labs/avalanchego/config"
-	"github.com/ava-labs/avalanchego/staking"
-	"github.com/ava-labs/avalanchego/utils/logging"
+	"github.com/chain4travel/caminogo/config"
+	"github.com/chain4travel/caminogo/staking"
+	"github.com/chain4travel/caminogo/utils/logging"
 )
 
 const (
@@ -65,7 +76,7 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	binaryPath := fmt.Sprintf("%s%s", goPath, "/src/github.com/ava-labs/avalanchego/build/avalanchego")
+	binaryPath := fmt.Sprintf("%s%s", goPath, "/src/github.com/chain4travel/caminogo/build/avalanchego")
 	if err := run(log, binaryPath); err != nil {
 		log.Fatal("%s", err)
 		os.Exit(1)

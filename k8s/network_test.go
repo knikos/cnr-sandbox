@@ -1,3 +1,14 @@
+// Copyright (C) 2022, Chain4Travel AG. All rights reserved.
+//
+// This file is a derived work, based on ava-labs code whose
+// original notices appear below.
+//
+// It is distributed under the same license conditions as the
+// original code from which it is derived.
+//
+// Much love to the original authors for their work.
+// **********************************************************
+
 package k8s
 
 import (
@@ -13,13 +24,13 @@ import (
 	"github.com/ava-labs/avalanche-network-runner/network"
 	"github.com/ava-labs/avalanche-network-runner/network/node"
 	"github.com/ava-labs/avalanche-network-runner/utils"
-	"github.com/ava-labs/avalanchego/api/health"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/staking"
-	"github.com/ava-labs/avalanchego/utils/constants"
-	"github.com/ava-labs/avalanchego/utils/logging"
+	"github.com/chain4travel/caminogo/api/health"
+	"github.com/chain4travel/caminogo/ids"
+	"github.com/chain4travel/caminogo/staking"
+	"github.com/chain4travel/caminogo/utils/constants"
+	"github.com/chain4travel/caminogo/utils/logging"
 
-	k8sapi "github.com/ava-labs/avalanchego-operator/api/v1alpha1"
+	k8sapi "github.com/chain4travel/caminogo-operator/api/v1alpha1"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
