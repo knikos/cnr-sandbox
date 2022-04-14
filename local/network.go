@@ -25,11 +25,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ava-labs/avalanche-network-runner/api"
-	"github.com/ava-labs/avalanche-network-runner/network"
-	"github.com/ava-labs/avalanche-network-runner/network/node"
-	"github.com/ava-labs/avalanche-network-runner/utils"
-	"github.com/ava-labs/avalanche-network-runner/utils/beacon"
+	"github.com/ava-labs/camino-network-runner/api"
+	"github.com/ava-labs/camino-network-runner/network"
+	"github.com/ava-labs/camino-network-runner/network/node"
+	"github.com/ava-labs/camino-network-runner/utils"
+	"github.com/ava-labs/camino-network-runner/utils/beacon"
 	"github.com/chain4travel/caminogo/config"
 	avago_utils "github.com/chain4travel/caminogo/utils"
 	"github.com/chain4travel/caminogo/utils/logging"
@@ -264,7 +264,7 @@ func newNetwork(
 	}
 
 	if dir == "" {
-		net.rootDir, err = os.MkdirTemp("", "avalanche-network-runner-*")
+		net.rootDir, err = os.MkdirTemp("", "camino-network-runner-*")
 		if err != nil {
 			return nil, err
 		}

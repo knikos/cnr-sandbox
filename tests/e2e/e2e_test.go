@@ -10,9 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ava-labs/avalanche-network-runner/client"
-	"github.com/ava-labs/avalanche-network-runner/pkg/color"
-	"github.com/ava-labs/avalanche-network-runner/pkg/logutil"
+	"github.com/ava-labs/camino-network-runner/client"
+	"github.com/ava-labs/camino-network-runner/pkg/color"
+	"github.com/ava-labs/camino-network-runner/pkg/logutil"
 	ginkgo "github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 )

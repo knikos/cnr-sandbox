@@ -12,9 +12,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ava-labs/avalanche-network-runner/pkg/color"
-	"github.com/ava-labs/avalanche-network-runner/pkg/logutil"
-	"github.com/ava-labs/avalanche-network-runner/rpcpb"
+	"github.com/ava-labs/camino-network-runner/pkg/color"
+	"github.com/ava-labs/camino-network-runner/pkg/logutil"
+	"github.com/ava-labs/camino-network-runner/rpcpb"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"

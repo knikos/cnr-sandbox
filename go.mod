@@ -1,4 +1,4 @@
-module github.com/ava-labs/avalanche-network-runner
+module github.com/ava-labs/camino-network-runner
 
 go 1.17
 

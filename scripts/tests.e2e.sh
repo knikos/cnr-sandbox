@@ -81,7 +81,7 @@ find /tmp/caminogo-v${VERSION_2}
 
 ############################
 echo "building runner"
-go build -v -o /tmp/network.runner ./cmd/avalanche-network-runner
+go build -v -o /tmp/network.runner ./cmd/camino-network-runner
 
 echo "building e2e.test"
 # to install the ginkgo binary (required for test build and run)

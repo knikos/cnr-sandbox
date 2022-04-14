@@ -15,11 +15,11 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/ava-labs/avalanche-network-runner/k8s"
-	"github.com/ava-labs/avalanche-network-runner/local"
-	"github.com/ava-labs/avalanche-network-runner/network"
-	"github.com/ava-labs/avalanche-network-runner/network/node"
-	"github.com/ava-labs/avalanche-network-runner/utils"
+	"github.com/ava-labs/camino-network-runner/k8s"
+	"github.com/ava-labs/camino-network-runner/local"
+	"github.com/ava-labs/camino-network-runner/network"
+	"github.com/ava-labs/camino-network-runner/network/node"
+	"github.com/ava-labs/camino-network-runner/utils"
 	"github.com/chain4travel/caminogo/utils/logging"
 	"github.com/stretchr/testify/assert"
 )

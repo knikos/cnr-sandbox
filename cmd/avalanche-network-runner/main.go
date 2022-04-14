@@ -7,15 +7,15 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ava-labs/avalanche-network-runner/cmd/avalanche-network-runner/control"
-	"github.com/ava-labs/avalanche-network-runner/cmd/avalanche-network-runner/ping"
-	"github.com/ava-labs/avalanche-network-runner/cmd/avalanche-network-runner/server"
+	"github.com/ava-labs/camino-network-runner/cmd/camino-network-runner/control"
+	"github.com/ava-labs/camino-network-runner/cmd/camino-network-runner/ping"
+	"github.com/ava-labs/camino-network-runner/cmd/camino-network-runner/server"
 	"github.com/spf13/cobra"
 )
 
 var rootCmd = &cobra.Command{
-	Use:        "avalanche-network-runner",
-	Short:      "avalanche-network-runner commands",
+	Use:        "camino-network-runner",
+	Short:      "camino-network-runner commands",
 	SuggestFor: []string{"network-runner"},
 }
 
@@ -33,7 +33,7 @@ func init() {
 
 func main() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintf(os.Stderr, "avalanche-network-runner failed %v\n", err)
+		fmt.Fprintf(os.Stderr, "camino-network-runner failed %v\n", err)
 		os.Exit(1)
 	}
 	os.Exit(0)

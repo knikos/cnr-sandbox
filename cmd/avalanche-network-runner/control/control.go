@@ -10,9 +10,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/ava-labs/avalanche-network-runner/client"
-	"github.com/ava-labs/avalanche-network-runner/pkg/color"
-	"github.com/ava-labs/avalanche-network-runner/pkg/logutil"
+	"github.com/ava-labs/camino-network-runner/client"
+	"github.com/ava-labs/camino-network-runner/pkg/color"
+	"github.com/ava-labs/camino-network-runner/pkg/logutil"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 )

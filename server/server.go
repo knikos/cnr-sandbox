@@ -19,8 +19,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ava-labs/avalanche-network-runner/network/node"
-	"github.com/ava-labs/avalanche-network-runner/rpcpb"
+	"github.com/ava-labs/camino-network-runner/network/node"
+	"github.com/ava-labs/camino-network-runner/rpcpb"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"

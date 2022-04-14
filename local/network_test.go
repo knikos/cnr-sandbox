@@ -24,12 +24,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ava-labs/avalanche-network-runner/api"
-	apimocks "github.com/ava-labs/avalanche-network-runner/api/mocks"
-	"github.com/ava-labs/avalanche-network-runner/local/mocks"
-	"github.com/ava-labs/avalanche-network-runner/network"
-	"github.com/ava-labs/avalanche-network-runner/network/node"
-	"github.com/ava-labs/avalanche-network-runner/utils"
+	"github.com/ava-labs/camino-network-runner/api"
+	apimocks "github.com/ava-labs/camino-network-runner/api/mocks"
+	"github.com/ava-labs/camino-network-runner/local/mocks"
+	"github.com/ava-labs/camino-network-runner/network"
+	"github.com/ava-labs/camino-network-runner/network/node"
+	"github.com/ava-labs/camino-network-runner/utils"
 	"github.com/chain4travel/caminogo/api/health"
 	"github.com/chain4travel/caminogo/config"
 	"github.com/chain4travel/caminogo/ids"
@@ -1100,7 +1100,7 @@ func TestWriteFiles(t *testing.T) {
 	genesis := []byte("genesis")
 	configFile := "config file"
 	cChainConfigFile := "c-chain config file"
-	tmpDir, err := os.MkdirTemp("", "avalanche-network-runner-tests-*")
+	tmpDir, err := os.MkdirTemp("", "camino-network-runner-tests-*")
 	if err != nil {
 		t.Fatal(err)
 	}

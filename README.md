@@ -189,7 +189,7 @@ type Node interface {
 ### Download
 
 ```sh
-git clone https://github.com/ava-labs/avalanche-network-runner.git
+git clone https://github.com/ava-labs/camino-network-runner.git
 ```
 
 ### Run Unit Tests
@@ -216,7 +216,7 @@ The network runs until the user provides a SIGINT or SIGTERM.
 It assumes:
 
 1. You have the latest AvalancheGo binaries at `$GOPATH/src/github.com/chain4travel/caminogo/build`. For instructions on setting up AvalancheGo, see [here.](https://github.com/chain4travel/caminogo)
-2. The network runner direcory is at `$GOPATH/src/github.com/ava-labs/avalanche-network-runner`.
+2. The network runner direcory is at `$GOPATH/src/github.com/ava-labs/camino-network-runner`.
 
 To run the demo:
 
@@ -228,7 +228,7 @@ We've also included another example at `examples/local/fivenodenetwork/main.go`,
 
 ## `network-runner` RPC server
 
-**What does `network-runner` do?** The primary focus of [`network-runner`](https://github.com/ava-labs/avalanche-network-runner) is to create a local network, as a test framework for local development.
+**What does `network-runner` do?** The primary focus of [`network-runner`](https://github.com/ava-labs/camino-network-runner) is to create a local network, as a test framework for local development.
 
 **Why `network-runner` as a binary?** Previously, each team was still required to write a substantial amount of Go code to integrate with `network-runner`. And the circular dependency on `caminogo` made it unusable within `caminogo` itself. Using `network-runner` as a binary (rather than Go package) eliminates the complexity of such dependency management.
 
@@ -242,14 +242,14 @@ We've also included another example at `examples/local/fivenodenetwork/main.go`,
 
 ```bash
 # to install
-cd ${HOME}/go/src/github.com/ava-labs/avalanche-network-runner
-go install -v ./cmd/avalanche-network-runner
+cd ${HOME}/go/src/github.com/ava-labs/camino-network-runner
+go install -v ./cmd/camino-network-runner
 ```
 
 To start the server:
 
 ```bash
-avalanche-network-runner server \
+camino-network-runner server \
 --log-level debug \
 --port=":8080" \
 --grpc-gateway-port=":8081"
@@ -261,7 +261,7 @@ To ping the server:
 curl -X POST -k http://localhost:8081/v1/ping -d ''
 
 # or
-avalanche-network-runner ping \
+camino-network-runner ping \
 --log-level debug \
 --endpoint="0.0.0.0:8080"
 ```
@@ -273,7 +273,7 @@ To start the server:
 curl -X POST -k http://localhost:8081/v1/control/start -d '{"execPath":"/Users/gyuho.lee/go/src/github.com/chain4travel/caminogo/build/caminogo","whitelistedSubnets":"24tZhrm8j8GCJRE9PomW8FaeqbgGS4UAQjJnqqn8pq5NwYSYV1","logLevel":"INFO"}'
 
 # or
-avalanche-network-runner control start \
+camino-network-runner control start \
 --log-level debug \
 --endpoint="0.0.0.0:8080" \
 --caminogo-path ${HOME}/go/src/github.com/chain4travel/caminogo/build/caminogo \
@@ -286,7 +286,7 @@ To wait for the cluster health:
 curl -X POST -k http://localhost:8081/v1/control/health -d ''
 
 # or
-avalanche-network-runner control health \
+camino-network-runner control health \
 --log-level debug \
 --endpoint="0.0.0.0:8080"
 ```
@@ -297,7 +297,7 @@ To get the cluster endpoints:
 curl -X POST -k http://localhost:8081/v1/control/uris -d ''
 
 # or
-avalanche-network-runner control uris \
+camino-network-runner control uris \
 --log-level debug \
 --endpoint="0.0.0.0:8080"
 ```
@@ -308,7 +308,7 @@ To query the cluster status from the server:
 curl -X POST -k http://localhost:8081/v1/control/status -d ''
 
 # or
-avalanche-network-runner control status \
+camino-network-runner control status \
 --log-level debug \
 --endpoint="0.0.0.0:8080"
 ```
@@ -316,7 +316,7 @@ avalanche-network-runner control status \
 To stream cluster status:
 
 ```bash
-avalanche-network-runner control \
+camino-network-runner control \
 --request-timeout=3m \
 stream-status \
 --push-interval=5s \
@@ -330,7 +330,7 @@ To remove (stop) a node:
 curl -X POST -k http://localhost:8081/v1/control/removenode -d '{"name":"node5"}'
 
 # or
-avalanche-network-runner control remove-node \
+camino-network-runner control remove-node \
 --request-timeout=3m \
 --log-level debug \
 --endpoint="0.0.0.0:8080" \
@@ -374,7 +374,7 @@ To restart a node:
 curl -X POST -k http://localhost:8081/v1/control/restartnode -d '{"name":"node1","startRequest":{"execPath":"/tmp/caminogo-v1.7.3/build/caminogo",whitelistedSubnets:"",,"logLevel":"INFO"}}'
 
 # or
-avalanche-network-runner control restart-node \
+camino-network-runner control restart-node \
 --request-timeout=3m \
 --log-level debug \
 --endpoint="0.0.0.0:8080" \
@@ -389,7 +389,7 @@ To terminate the cluster:
 curl -X POST -k http://localhost:8081/v1/control/stop -d ''
 
 # or
-avalanche-network-runner control stop \
+camino-network-runner control stop \
 --log-level debug \
 --endpoint="0.0.0.0:8080"
 ```

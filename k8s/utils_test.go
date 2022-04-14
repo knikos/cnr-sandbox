@@ -16,9 +16,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ava-labs/avalanche-network-runner/network"
-	"github.com/ava-labs/avalanche-network-runner/network/node"
-	"github.com/ava-labs/avalanche-network-runner/utils"
+	"github.com/ava-labs/camino-network-runner/network"
+	"github.com/ava-labs/camino-network-runner/network/node"
+	"github.com/ava-labs/camino-network-runner/utils"
 	"github.com/chain4travel/caminogo/utils/logging"
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"

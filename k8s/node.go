@@ -12,8 +12,8 @@
 package k8s
 
 import (
-	"github.com/ava-labs/avalanche-network-runner/api"
-	"github.com/ava-labs/avalanche-network-runner/network/node"
+	"github.com/ava-labs/camino-network-runner/api"
+	"github.com/ava-labs/camino-network-runner/network/node"
 	k8sapi "github.com/chain4travel/caminogo-operator/api/v1alpha1"
 	"github.com/chain4travel/caminogo/ids"
 )

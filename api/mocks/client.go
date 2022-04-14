@@ -14,7 +14,7 @@
 package mocks
 
 import (
-	api "github.com/ava-labs/avalanche-network-runner/api"
+	api "github.com/ava-labs/camino-network-runner/api"
 	admin "github.com/chain4travel/caminogo/api/admin"
 
 	avm "github.com/chain4travel/caminogo/vms/avm"
