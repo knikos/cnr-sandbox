@@ -171,7 +171,7 @@ func (npc *nodeProcessCreator) NewNodeProcess(config node.Config, args ...string
 	if err := json.Unmarshal(config.ImplSpecificConfig, &localNodeConfig); err != nil {
 		return nil, fmt.Errorf("couldn't unmarshal local.NodeConfig: %w", err)
 	}
-	// Start the AvalancheGo node and pass it the flags defined above
+	// Start the CaminoGo node and pass it the flags defined above
 	cmd := exec.Command(localNodeConfig.BinaryPath, args...)
 	// assign a new color to this process (might not be used if the localNodeConfig isn't set for it)
 	color := npc.colorPicker.NextColor()
@@ -387,7 +387,7 @@ func (ln *localNetwork) addNode(nodeConfig node.Config) (node.Node, error) {
 		return nil, fmt.Errorf("Unmarshalling an expected local.NodeConfig object failed: %w", err)
 	}
 
-	// Start the AvalancheGo node and pass it the flags defined above
+	// Start the CaminoGo node and pass it the flags defined above
 	nodeProcess, err := ln.nodeProcessCreator.NewNodeProcess(nodeConfig, flags...)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create new node process: %s", err)
@@ -750,7 +750,7 @@ func (ln *localNetwork) buildFlags(
 		return nil, 0, 0, err
 	}
 
-	// Flags for AvalancheGo
+	// Flags for CaminoGo
 	flags := []string{
 		fmt.Sprintf("--%s=%d", config.NetworkNameKey, ln.networkID),
 		fmt.Sprintf("--%s=%s", config.DBPathKey, dbPath),

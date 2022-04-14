@@ -146,7 +146,7 @@ func (c *Config) Validate() error {
 // [cChainBalances] and [xChainBalances].
 // Note that many of the genesis fields (i.e. reward addresses)
 // are randomly generated or hard-coded.
-func NewAvalancheGoGenesis(
+func NewCaminoGoGenesis(
 	log logging.Logger,
 	networkID uint32,
 	xChainBalances []AddrAndBalance,
@@ -232,6 +232,6 @@ func NewAvalancheGoGenesis(
 		)
 	}
 
-	// TODO add validation (from AvalancheGo's function validateConfig?)
+	// TODO add validation (from CaminoGo's function validateConfig?)
 	return json.Marshal(config)
 }

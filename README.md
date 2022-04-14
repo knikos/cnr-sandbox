@@ -1,4 +1,4 @@
-# Avalanche Network Runner
+# Camino Network Runner
 
 ## Note
 
@@ -8,7 +8,7 @@ Nonetheless, this README should provide valuable information about using this to
 
 ## Overview
 
-This is a tool to run and interact with an Avalanche network.
+This is a tool to run and interact with an Camino network.
 The nodes that compose the network can run either locally or in a Kubernetes cluster.
 This tool may be especially useful for development and testing.
 
@@ -54,7 +54,7 @@ whereas a node running locally has a config field that specifies the path of the
 
 ## Genesis Generation
 
-You can create a custom AvalancheGo genesis with function `network.NewAvalancheGoGenesis`:
+You can create a custom CaminoGo genesis with function `network.NewCaminoGoGenesis`:
 
 ```go
 // Return a genesis JSON where:
@@ -63,7 +63,7 @@ You can create a custom AvalancheGo genesis with function `network.NewAvalancheG
 // [cChainBalances] and [xChainBalances].
 // Note that many of the genesis fields (i.e. reward addresses)
 // are randomly generated or hard-coded.
-func NewAvalancheGoGenesis(
+func NewCaminoGoGenesis(
   log logging.Logger,
   networkID uint32,
   xChainBalances []AddrAndBalance,
@@ -135,10 +135,10 @@ The associated pre-defined configuration is also available to users by calling `
 
 ## Network Interaction
 
-The network runner allows users to interact with an AvalancheGo network using the `network.Network` interface:
+The network runner allows users to interact with an CaminoGo network using the `network.Network` interface:
 
 ```go
-// Network is an abstraction of an Avalanche network
+// Network is an abstraction of an Camino network
 type Network interface {
   // Returns a chan that is closed when
   // all the nodes in the network are healthy.
@@ -172,12 +172,12 @@ type Network interface {
 and allows users to interact with a node using the `node.Node` interface:
 
 ```go
-// An AvalancheGo node
+// An CaminoGo node
 type Node interface {
     // Return this node's name, which is unique
     // across all the nodes in its network.
     GetName() string
-    // Return this node's Avalanche node ID.
+    // Return this node's Camino node ID.
     GetNodeID() ids.ShortID
     // Return a client that can be used to make API calls.
     GetAPIClient() api.Client
@@ -205,7 +205,7 @@ go test ./...
 As an example of how to use the network runner, we've included a `main.go` that uses the local implementation of the network runner.
 When run, it:
 
-* Creates a local five node Avalanche network and waits for all nodes to become healthy.
+* Creates a local five node Camino network and waits for all nodes to become healthy.
 * Prints the names of the nodes
 * Prints the node ID of one node
 * Starts a new node
@@ -215,7 +215,7 @@ The network runs until the user provides a SIGINT or SIGTERM.
 
 It assumes:
 
-1. You have the latest AvalancheGo binaries at `$GOPATH/src/github.com/chain4travel/caminogo/build`. For instructions on setting up AvalancheGo, see [here.](https://github.com/chain4travel/caminogo)
+1. You have the latest CaminoGo binaries at `$GOPATH/src/github.com/chain4travel/caminogo/build`. For instructions on setting up CaminoGo, see [here.](https://github.com/chain4travel/caminogo)
 2. The network runner direcory is at `$GOPATH/src/github.com/chain4travel/camino-network-runner`.
 
 To run the demo:

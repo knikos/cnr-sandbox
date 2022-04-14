@@ -121,9 +121,9 @@ github.com/chain4travel/caminogo v1.7.4 h1:NTLDw9oh+Y+acH2xTsFtxMxPMDTISkpJReL+l
 github.com/chain4travel/caminogo v1.7.4/go.mod h1:+xnmwjlkeNHhs0v5p2yvdv7cw0jgyq4SyU9O+S4EUPs=
 github.com/chain4travel/caminogo-operator v0.0.0-20211115144351-99f07d2570bf h1:vHIdrlBIqbkqbERfPX3Ut+Ofg2vsqdB8OC6JMegT0qk=
 github.com/chain4travel/caminogo-operator v0.0.0-20211115144351-99f07d2570bf/go.mod h1:RTkVkouQ0HBSBVSFAQCUviXPU7Iuxoy+Fui3ykmD9HA=
-github.com/chain4travel/coreth v0.8.4-rc.1/go.mod h1:bP2Atm7pCJdx8fwzsPT3xU/kWOdHFklpja7aRNT++Qo=
-github.com/chain4travel/coreth v0.8.4-rc.3 h1:pe1mDRgit8eYYPdmFfCyNms7NN+24LaTvMB56lMZcFI=
-github.com/chain4travel/coreth v0.8.4-rc.3/go.mod h1:9TgpLJVY9ot6RV8Lh66F356S4MfalvaL3sAqw4+miTU=
+github.com/chain4travel/caminoethvm v0.8.4-rc.1/go.mod h1:bP2Atm7pCJdx8fwzsPT3xU/kWOdHFklpja7aRNT++Qo=
+github.com/chain4travel/caminoethvm v0.8.4-rc.3 h1:pe1mDRgit8eYYPdmFfCyNms7NN+24LaTvMB56lMZcFI=
+github.com/chain4travel/caminoethvm v0.8.4-rc.3/go.mod h1:9TgpLJVY9ot6RV8Lh66F356S4MfalvaL3sAqw4+miTU=
 github.com/aws/aws-sdk-go-v2 v1.2.0/go.mod h1:zEQs02YRBw1DjK0PoJv3ygDYOFTre1ejlJWl8FwAuQo=
 github.com/aws/aws-sdk-go-v2/config v1.1.1/go.mod h1:0XsVy9lBI/BCXm+2Tuvt39YmdHwS5unDQmxZOYe8F5Y=
 github.com/aws/aws-sdk-go-v2/credentials v1.1.1/go.mod h1:mM2iIjwl7LULWtS6JCACyInboHirisUUdkBPoTHMOUo=

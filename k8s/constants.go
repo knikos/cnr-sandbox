@@ -13,7 +13,7 @@ const (
 	nodeReachableCheckFreq = 5 * time.Second
 	healthCheckFreq        = 3 * time.Second
 	// TODO export these default ports from the
-	// AvalancheGo operator and use the imported
+	// CaminoGo operator and use the imported
 	// values instead of re-defining them below.
 	defaultAPIPort = uint16(9650)
 	defaultP2PPort = uint16(9651)

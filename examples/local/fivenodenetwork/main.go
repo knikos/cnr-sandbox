@@ -50,8 +50,8 @@ func shutdownOnSignal(
 	close(closedOnShutdownChan)
 }
 
-// Shows example usage of the Avalanche Network Runner.
-// Creates a local five node Avalanche network
+// Shows example usage of the Camino Network Runner.
+// Creates a local five node Camino network
 // and waits for all nodes to become healthy.
 // The network runs until the user provides a SIGINT or SIGTERM.
 func main() {

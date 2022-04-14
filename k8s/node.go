@@ -33,7 +33,7 @@ type ObjectSpec struct {
 
 // Node is a Caminogo representation on k8s
 type Node struct {
-	// This node's AvalancheGo node ID
+	// This node's CaminoGo node ID
 	nodeID ids.ShortID
 	// Unique name of this node
 	name string

@@ -9,7 +9,7 @@ import (
 
 var ErrStopped = errors.New("network stopped")
 
-// Network is an abstraction of an Avalanche network
+// Network is an abstraction of an Camino network
 type Network interface {
 	// Returns a chan that is closed when
 	// all the nodes in the network are healthy.

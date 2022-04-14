@@ -38,7 +38,7 @@ type NodeConfig struct {
 }
 
 // NodeProcess as an interface so we can mock running
-// AvalancheGo binaries in tests
+// CaminoGo binaries in tests
 type NodeProcess interface {
 	// Start this process
 	Start() error

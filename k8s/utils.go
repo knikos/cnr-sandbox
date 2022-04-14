@@ -28,7 +28,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// Convert a config flag to the format AvalancheGo expects
+// Convert a config flag to the format CaminoGo expects
 // environment variable config flags in.
 // e.g. bootstrap-ips --> AVAGO_BOOTSTRAP_IPS
 // e.g. log-level --> AVAGO_LOG_LEVEL
@@ -76,7 +76,7 @@ func buildNodeEnv(log logging.Logger, genesis []byte, c node.Config) ([]corev1.E
 		}
 	}
 
-	// AvalancheGo expects environment variable config keys in.
+	// CaminoGo expects environment variable config keys in.
 	// e.g. bootstrap-ips --> AVAGO_BOOTSTRAP_IPS
 	// e.g. log-level --> AVAGO_LOG_LEVEL
 	env := []corev1.EnvVar{
@@ -158,7 +158,7 @@ func validateObjectSpec(k8sobj ObjectSpec) error {
 	case k8sobj.APIVersion == "":
 		return errors.New("APIVersion should not be empty")
 	case k8sobj.Kind != "Caminogo":
-		// only "AvalancheGo" currently supported -- mandated by caminogo-operator
+		// only "CaminoGo" currently supported -- mandated by caminogo-operator
 		return fmt.Errorf("expected \"Caminogo\" but got %q", k8sobj.Kind)
 	case k8sobj.Namespace == "":
 		return errors.New("namespace should be defined to avoid unintended consequences")

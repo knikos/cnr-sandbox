@@ -19,7 +19,7 @@ import (
 
 	avm "github.com/chain4travel/caminogo/vms/avm"
 
-	evm "github.com/chain4travel/coreth/plugin/evm"
+	evm "github.com/chain4travel/caminoethvm/plugin/evm"
 
 	health "github.com/chain4travel/caminogo/api/health"
 

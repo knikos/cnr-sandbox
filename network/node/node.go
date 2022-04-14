@@ -21,12 +21,12 @@ import (
 	"github.com/chain4travel/caminogo/ids"
 )
 
-// Node represents an AvalancheGo node
+// Node represents an CaminoGo node
 type Node interface {
 	// Return this node's name, which is unique
 	// across all the nodes in its network.
 	GetName() string
-	// Return this node's Avalanche node ID.
+	// Return this node's Camino node ID.
 	GetNodeID() ids.ShortID
 	// Return a client that can be used to make API calls.
 	GetAPIClient() api.Client

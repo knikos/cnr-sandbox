@@ -22,7 +22,7 @@ import (
 	"github.com/chain4travel/caminogo/indexer"
 	"github.com/chain4travel/caminogo/vms/avm"
 	"github.com/chain4travel/caminogo/vms/platformvm"
-	"github.com/chain4travel/coreth/plugin/evm"
+	"github.com/chain4travel/caminoethvm/plugin/evm"
 )
 
 // interface compliance
