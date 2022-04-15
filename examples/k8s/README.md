@@ -32,7 +32,6 @@ If running in a cloud provided (for Ava Labs, typically AWS), then the **devops*
 
 **Devops would be deploying the `caminogo-operator`**.
 
-
 The normal operation is to create a github action which triggers the deployment to the kubernetes cluster in the cloud. 
 An example of such a github action can be found at `examples/github` **TODO**.
 The github action triggers the deployment of a self-contained pod or a permissioned `main` with access to the cluster.

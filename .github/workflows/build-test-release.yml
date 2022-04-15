@@ -4,9 +4,8 @@ on:
   push:
     branches:
       - chain4travel
-    tags:
-      - "*"
   pull_request:
+  release:
 
 permissions:
   contents: write
@@ -30,6 +29,7 @@ jobs:
   unit_test:
     name: Unit tests
     runs-on: ubuntu-latest
+    concurrency: node_fence
     steps:
       - name: Allow access to caminogo-operator repo
         env:
@@ -43,6 +43,7 @@ jobs:
   #e2e_test:
   #  name: e2e tests
   #  runs-on: ubuntu-latest
+  #  concurrency: node_fence
   #  steps:
   #    - name: Git checkout
   #      uses: actions/checkout@v2
@@ -58,6 +59,7 @@ jobs:
   release:
     #needs: [lint_test, unit_test, e2e_test]
     needs: [lint_test, unit_test]
+    if: github.event_name == 'release' && github.event.action == 'created'
     runs-on: ubuntu-latest
     steps:
       - name: Git checkout
