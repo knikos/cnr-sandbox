@@ -12,10 +12,15 @@
 package k8s
 
 import (
+	"context"
+	"errors"
+
 	"github.com/chain4travel/camino-network-runner/api"
 	"github.com/chain4travel/camino-network-runner/network/node"
 	k8sapi "github.com/chain4travel/caminogo-operator/api/v1alpha1"
 	"github.com/chain4travel/caminogo/ids"
+	"github.com/chain4travel/caminogo/network/peer"
+	"github.com/chain4travel/caminogo/snow/networking/router"
 )
 
 var _ node.Node = &Node{}
@@ -43,6 +48,12 @@ type Node struct {
 	apiClient api.Client
 	// K8s description of this node
 	k8sObjSpec *k8sapi.Caminogo
+}
+
+// AttachPeer see Network
+// TODO: Not yet implemented
+func (n *Node) AttachPeer(ctx context.Context, handler router.InboundHandler) (peer.Peer, error) {
+	return nil, errors.New("AttachPeer is not implemented")
 }
 
 // See node.Node

@@ -180,6 +180,29 @@ func (_m *InfoClient) GetTxFee(_a0 context.Context, _a1 ...rpc.Option) (*info.Ge
 	return r0, r1
 }
 
+// GetVMs provides a mock function with given fields: _a0, _a1
+func (_m *InfoClient) GetVMs(_a0 context.Context, _a1 ...rpc.Option) (map[ids.ID][]string, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 map[ids.ID][]string
+	if rf, ok := ret.Get(0).(func(context.Context) map[ids.ID][]string); ok {
+		r0 = rf(_a0)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(map[ids.ID][]string)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(_a0)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // IsBootstrapped provides a mock function with given fields: _a0, _a1, _a2
 func (_m *InfoClient) IsBootstrapped(_a0 context.Context, _a1 string, _a2 ...rpc.Option) (bool, error) {
 	ret := _m.Called(_a0, _a1, _a2)
@@ -234,29 +257,6 @@ func (_m *InfoClient) Uptime(_a0 context.Context, _a1 ...rpc.Option) (*info.Upti
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*info.UptimeResponse)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = rf(_a0)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// GetVMs provides a mock function with given fields: _a0, _a1
-func (_m *InfoClient) GetVMs(_a0 context.Context, _a1 ...rpc.Option) (map[ids.ID][]string, error) {
-	ret := _m.Called(_a0, _a1)
-
-	var r0 map[ids.ID][]string
-	if rf, ok := ret.Get(0).(func(context.Context) map[ids.ID][]string); ok {
-		r0 = rf(_a0)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(map[ids.ID][]string)
 		}
 	}
 

@@ -12,6 +12,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/chain4travel/camino-network-runner/local"
 	"github.com/chain4travel/camino-network-runner/pkg/color"
 	"github.com/chain4travel/camino-network-runner/pkg/logutil"
 	"github.com/chain4travel/camino-network-runner/rpcpb"
@@ -38,6 +39,8 @@ type Client interface {
 	RemoveNode(ctx context.Context, name string) (*rpcpb.RemoveNodeResponse, error)
 	RestartNode(ctx context.Context, name string, execPath string, opts ...OpOption) (*rpcpb.RestartNodeResponse, error)
 	Stop(ctx context.Context) (*rpcpb.StopResponse, error)
+	AttachPeer(ctx context.Context, nodeName string) (*rpcpb.AttachPeerResponse, error)
+	SendOutboundMessage(ctx context.Context, nodeName string, peerID string, op uint32, msgBody []byte) (*rpcpb.SendOutboundMessageResponse, error)
 	Close() error
 }
 
@@ -93,12 +96,13 @@ func (c *client) Ping(ctx context.Context) (*rpcpb.PingResponse, error) {
 }
 
 func (c *client) Start(ctx context.Context, execPath string, opts ...OpOption) (*rpcpb.StartResponse, error) {
-	ret := &Op{}
+	ret := &Op{numNodes: local.DefaultNumNodes}
 	ret.applyOpts(opts)
 
 	zap.L().Info("start")
 	return c.controlc.Start(ctx, &rpcpb.StartRequest{
 		ExecPath:           execPath,
+		NumNodes:           &ret.numNodes,
 		WhitelistedSubnets: &ret.whitelistedSubnets,
 		LogLevel:           &ret.logLevel,
 	})
@@ -194,6 +198,21 @@ func (c *client) RestartNode(ctx context.Context, name string, execPath string, 
 	})
 }
 
+func (c *client) AttachPeer(ctx context.Context, nodeName string) (*rpcpb.AttachPeerResponse, error) {
+	zap.L().Info("attaching peer", zap.String("node-name", nodeName))
+	return c.controlc.AttachPeer(ctx, &rpcpb.AttachPeerRequest{NodeName: nodeName})
+}
+
+func (c *client) SendOutboundMessage(ctx context.Context, nodeName string, peerID string, op uint32, msgBody []byte) (*rpcpb.SendOutboundMessageResponse, error) {
+	zap.L().Info("sending outbound message", zap.String("node-name", nodeName), zap.String("peer-id", peerID))
+	return c.controlc.SendOutboundMessage(ctx, &rpcpb.SendOutboundMessageRequest{
+		NodeName: nodeName,
+		PeerId:   peerID,
+		Op:       op,
+		Bytes:    msgBody,
+	})
+}
+
 func (c *client) Close() error {
 	c.closeOnce.Do(func() {
 		close(c.closed)
@@ -202,6 +221,7 @@ func (c *client) Close() error {
 }
 
 type Op struct {
+	numNodes           uint32
 	whitelistedSubnets string
 	logLevel           string
 }
@@ -211,6 +231,12 @@ type OpOption func(*Op)
 func (op *Op) applyOpts(opts []OpOption) {
 	for _, opt := range opts {
 		opt(op)
+	}
+}
+
+func WithNumNodes(numNodes uint32) OpOption {
+	return func(op *Op) {
+		op.numNodes = numNodes
 	}
 }
 

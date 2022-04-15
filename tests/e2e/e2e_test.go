@@ -7,17 +7,25 @@ package e2e_test
 import (
 	"context"
 	"flag"
+	"os"
 	"testing"
 	"time"
 
 	"github.com/chain4travel/camino-network-runner/client"
 	"github.com/chain4travel/camino-network-runner/pkg/color"
 	"github.com/chain4travel/camino-network-runner/pkg/logutil"
+	"github.com/chain4travel/caminogo/ids"
+	"github.com/chain4travel/caminogo/message"
+	"github.com/chain4travel/caminogo/utils/constants"
 	ginkgo "github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 func TestE2e(t *testing.T) {
+	if os.Getenv("RUN_E2E") == "" {
+		t.Skip("Environment variable RUN_E2E not set; skipping E2E tests")
+	}
 	gomega.RegisterFailHandler(ginkgo.Fail)
 	ginkgo.RunSpecs(t, "network-runner-example e2e test suites")
 }
@@ -136,8 +144,8 @@ var _ = ginkgo.Describe("[Start/Remove/Restart/Stop]", func() {
 		}
 	})
 
+	time.Sleep(10 * time.Second)
 	ginkgo.It("can remove", func() {
-		time.Sleep(time.Minute)
 		ginkgo.By("calling remove API with the first binary", func() {
 			ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
 			resp, err := cli.RemoveNode(ctx, "node5")
@@ -147,14 +155,52 @@ var _ = ginkgo.Describe("[Start/Remove/Restart/Stop]", func() {
 		})
 	})
 
+	time.Sleep(10 * time.Second)
 	ginkgo.It("can restart", func() {
-		time.Sleep(time.Minute)
 		ginkgo.By("calling restart API with the second binary", func() {
 			ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
 			resp, err := cli.RestartNode(ctx, "node4", execPath2)
 			cancel()
 			gomega.Ω(err).Should(gomega.BeNil())
 			color.Outf("{{green}}successfully restarted:{{/}} %+v\n", resp.ClusterInfo.NodeNames)
+		})
+	})
+
+	time.Sleep(10 * time.Second)
+	ginkgo.It("can attach a peer", func() {
+		ginkgo.By("calling attach peer API", func() {
+			ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+			resp, err := cli.AttachPeer(ctx, "node1")
+			cancel()
+			gomega.Ω(err).Should(gomega.BeNil())
+
+			v, ok := resp.ClusterInfo.AttachedPeerInfos["node1"]
+			gomega.Ω(ok).Should(gomega.BeTrue())
+			color.Outf("{{green}}successfully attached peer:{{/}} %+v\n", v.Peers)
+
+			mc, err := message.NewCreator(
+				prometheus.NewRegistry(),
+				true,
+				"",
+				10*time.Second,
+			)
+			gomega.Ω(err).Should(gomega.BeNil())
+
+			containerIDs := []ids.ID{
+				ids.GenerateTestID(),
+				ids.GenerateTestID(),
+				ids.GenerateTestID(),
+			}
+			requestID := uint32(42)
+			chainID := constants.PlatformChainID
+			msg, err := mc.Chits(chainID, requestID, containerIDs)
+			gomega.Ω(err).Should(gomega.BeNil())
+
+			ctx, cancel = context.WithTimeout(context.Background(), 2*time.Minute)
+			sresp, err := cli.SendOutboundMessage(ctx, "node1", v.Peers[0].Id, uint32(msg.Op()), msg.Bytes())
+			cancel()
+			gomega.Ω(err).Should(gomega.BeNil())
+			gomega.Ω(sresp.Sent).Should(gomega.BeTrue())
 		})
 	})
 })

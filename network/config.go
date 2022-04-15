@@ -24,7 +24,6 @@ import (
 	"github.com/chain4travel/caminogo/ids"
 	"github.com/chain4travel/caminogo/utils/constants"
 	"github.com/chain4travel/caminogo/utils/formatting"
-	"github.com/chain4travel/caminogo/utils/logging"
 	"github.com/chain4travel/caminogo/utils/units"
 )
 
@@ -83,7 +82,7 @@ func (b *Backend) UnmarshalJSON(bytes []byte) error {
 
 // Config that defines a network when it is created.
 type Config struct {
-	// Must not be nil
+	// Must not be empty
 	Genesis string `json:"genesis"`
 	// May have length 0
 	// (i.e. network may have no nodes on creation.)
@@ -147,7 +146,6 @@ func (c *Config) Validate() error {
 // Note that many of the genesis fields (i.e. reward addresses)
 // are randomly generated or hard-coded.
 func NewCaminoGoGenesis(
-	log logging.Logger,
 	networkID uint32,
 	xChainBalances []AddrAndBalance,
 	cChainBalances []AddrAndBalance,

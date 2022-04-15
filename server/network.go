@@ -28,9 +28,9 @@ import (
 	"github.com/chain4travel/camino-network-runner/api"
 	"github.com/chain4travel/camino-network-runner/local"
 	"github.com/chain4travel/camino-network-runner/network"
-	"github.com/chain4travel/camino-network-runner/network/node"
 	"github.com/chain4travel/camino-network-runner/pkg/color"
 	"github.com/chain4travel/camino-network-runner/rpcpb"
+	"github.com/chain4travel/caminogo/network/peer"
 	"github.com/chain4travel/caminogo/utils/constants"
 	"github.com/chain4travel/caminogo/utils/logging"
 )
@@ -44,8 +44,10 @@ type localNetwork struct {
 	nw network.Network
 
 	nodeNames []string
-	nodes     map[string]node.Node
 	nodeInfos map[string]*rpcpb.NodeInfo
+
+	// maps from node name to peer ID to peer object
+	attachedPeers map[string]map[string]peer.Peer
 
 	apiClis map[string]api.Client
 
@@ -59,7 +61,7 @@ type localNetwork struct {
 	stopOnce sync.Once
 }
 
-func newNetwork(execPath string, rootDataDir string, whitelistedSubnets string, logLevel string) (*localNetwork, error) {
+func newNetwork(execPath string, rootDataDir string, numNodes uint32, whitelistedSubnets string, logLevel string) (*localNetwork, error) {
 	lcfg := logging.DefaultConfig
 	lcfg.Directory = rootDataDir
 	logFactory := logging.NewFactory(lcfg)
@@ -73,7 +75,10 @@ func newNetwork(execPath string, rootDataDir string, whitelistedSubnets string, 
 	}
 
 	nodeInfos := make(map[string]*rpcpb.NodeInfo)
-	cfg := local.NewDefaultConfig(execPath)
+	cfg, err := local.NewDefaultConfigNNodes(execPath, numNodes)
+	if err != nil {
+		return nil, err
+	}
 	nodeNames := make([]string, len(cfg.NodeConfigs))
 	for i := range cfg.NodeConfigs {
 		nodeName := fmt.Sprintf("node%d", i+1)
@@ -124,9 +129,10 @@ func newNetwork(execPath string, rootDataDir string, whitelistedSubnets string, 
 		binPath: execPath,
 		cfg:     cfg,
 
-		nodeNames: nodeNames,
-		nodeInfos: nodeInfos,
-		apiClis:   make(map[string]api.Client),
+		nodeNames:     nodeNames,
+		nodeInfos:     nodeInfos,
+		apiClis:       make(map[string]api.Client),
+		attachedPeers: make(map[string]map[string]peer.Peer),
 
 		readyc: make(chan struct{}),
 
@@ -180,8 +186,6 @@ func (lc *localNetwork) waitForHealthy() error {
 	if err != nil {
 		return err
 	}
-	lc.nodes = nodes
-
 	for name, node := range nodes {
 		uri := fmt.Sprintf("http://%s:%d", node.GetURL(), node.GetAPIPort())
 		nodeID := node.GetNodeID().PrefixedString(constants.NodeIDPrefix)

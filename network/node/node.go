@@ -12,6 +12,7 @@
 package node
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -19,6 +20,8 @@ import (
 	"github.com/chain4travel/camino-network-runner/api"
 	"github.com/chain4travel/caminogo/config"
 	"github.com/chain4travel/caminogo/ids"
+	"github.com/chain4travel/caminogo/network/peer"
+	"github.com/chain4travel/caminogo/snow/networking/router"
 )
 
 // Node represents an CaminoGo node
@@ -38,6 +41,12 @@ type Node interface {
 	GetP2PPort() uint16
 	// Return this node's HTP API port.
 	GetAPIPort() uint16
+	// Starts a new test peer, connects it to the given node, and returns the peer.
+	// [handler] defines how the test peer handles messages it receives.
+	// The test peer can be used to send messages to the node it's attached to.
+	// It's left to the caller to maintain a reference to the returned peer.
+	// The caller should call StartClose() on the peer when they're done with it.
+	AttachPeer(ctx context.Context, handler router.InboundHandler) (peer.Peer, error)
 }
 
 // Config encapsulates an caminogo configuration

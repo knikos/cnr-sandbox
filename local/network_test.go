@@ -33,6 +33,8 @@ import (
 	"github.com/chain4travel/caminogo/api/health"
 	"github.com/chain4travel/caminogo/config"
 	"github.com/chain4travel/caminogo/ids"
+	"github.com/chain4travel/caminogo/message"
+	"github.com/chain4travel/caminogo/snow/networking/router"
 	"github.com/chain4travel/caminogo/staking"
 	"github.com/chain4travel/caminogo/utils/constants"
 	"github.com/chain4travel/caminogo/utils/logging"
@@ -40,17 +42,16 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-const (
-	defaultHealthyTimeout = 5 * time.Second
-)
+const defaultHealthyTimeout = 5 * time.Second
 
 var (
-	_ NodeProcessCreator = &localTestSuccessfulNodeProcessCreator{}
-	_ NodeProcessCreator = &localTestFailedStartProcessCreator{}
-	_ NodeProcessCreator = &localTestProcessUndefNodeProcessCreator{}
-	_ NodeProcessCreator = &localTestFlagCheckProcessCreator{}
-	_ api.NewAPIClientF  = newMockAPISuccessful
-	_ api.NewAPIClientF  = newMockAPIUnhealthy
+	_ NodeProcessCreator    = &localTestSuccessfulNodeProcessCreator{}
+	_ NodeProcessCreator    = &localTestFailedStartProcessCreator{}
+	_ NodeProcessCreator    = &localTestProcessUndefNodeProcessCreator{}
+	_ NodeProcessCreator    = &localTestFlagCheckProcessCreator{}
+	_ api.NewAPIClientF     = newMockAPISuccessful
+	_ api.NewAPIClientF     = newMockAPIUnhealthy
+	_ router.InboundHandler = &noOpInboundHandler{}
 )
 
 type localTestSuccessfulNodeProcessCreator struct{}
@@ -128,6 +129,10 @@ func newMockProcessSuccessful(node.Config, ...string) (NodeProcess, error) {
 	process.On("Stop").Return(nil)
 	return process, nil
 }
+
+type noOpInboundHandler struct{}
+
+func (*noOpInboundHandler) HandleInbound(message.InboundMessage) {}
 
 // Start a network with no nodes
 func TestNewNetworkEmpty(t *testing.T) {
@@ -879,7 +884,6 @@ func emptyNetworkConfig() (network.Config, error) {
 	networkID := uint32(1337)
 	// Use a dummy genesis
 	genesis, err := network.NewCaminoGoGenesis(
-		logging.NoLog{},
 		networkID,
 		[]network.AddrAndBalance{
 			{

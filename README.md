@@ -200,6 +200,31 @@ Inside the directory cloned above:
 go test ./...
 ```
 
+### Run E2E test
+
+The E2E test checks `network-runner` RPC communication and control. It starts a network against a fresh RPC
+server and executes a set of query and control operations on it.
+
+To start it, execute inside the cloned directory:
+
+```sh
+./scripts/tests.e2e.sh CAMINOGO_VERSION1 CAMINOGO_VERSION2
+```
+
+The E2E test checks wheter a node can be restarted with a different binary version. Provide two
+different versions as arguments. For Example:
+
+```sh
+./scripts/tests.e2e.sh 0.1.0 0.1.1
+```
+
+#### `RUN_E2E` environment variable
+
+To specify that the E2E test should be run with `go test`, set environment variable `RUN_E2E` to any non-empty value. 
+
+This environment variable is correctly set when executing `./scripts/tests.e2e.sh`, but the user should consider 
+setting it if trying to execute E2E tests without using that script.
+
 ### Run an Example
 
 As an example of how to use the network runner, we've included a `main.go` that uses the local implementation of the network runner.
@@ -270,7 +295,7 @@ To start the server:
 
 ```bash
 # replace with your local path
-curl -X POST -k http://localhost:8081/v1/control/start -d '{"execPath":"/Users/gyuho.lee/go/src/github.com/chain4travel/caminogo/build/caminogo","whitelistedSubnets":"24tZhrm8j8GCJRE9PomW8FaeqbgGS4UAQjJnqqn8pq5NwYSYV1","logLevel":"INFO"}'
+curl -X POST -k http://localhost:8081/v1/control/start -d '{"execPath":"/Users/gyuho.lee/go/src/github.com/chain4travel/caminogo/build/caminogo","numNodes":5,"whitelistedSubnets":"24tZhrm8j8GCJRE9PomW8FaeqbgGS4UAQjJnqqn8pq5NwYSYV1","logLevel":"INFO"}'
 
 # or
 camino-network-runner control start \
@@ -342,7 +367,7 @@ To restart a node, download the test binary:
 ```bash
 # [optional] download a binary to update
 # https://github.com/chain4travel/caminogo/releases
-VERSION=1.7.3
+VERSION=0.1.0
 GOARCH=$(go env GOARCH)
 GOOS=$(go env GOOS)
 DOWNLOAD_URL=https://github.com/chain4travel/caminogo/releases/download/v${VERSION}/caminogo-linux-${GOARCH}-v${VERSION}.tar.gz
@@ -371,7 +396,7 @@ find /tmp/caminogo-v${VERSION}
 To restart a node:
 
 ```bash
-curl -X POST -k http://localhost:8081/v1/control/restartnode -d '{"name":"node1","startRequest":{"execPath":"/tmp/caminogo-v1.7.3/build/caminogo",whitelistedSubnets:"",,"logLevel":"INFO"}}'
+curl -X POST -k http://localhost:8081/v1/control/restartnode -d '{"name":"node1","startRequest":{"execPath":"/tmp/caminogo-v0.1.0/build/caminogo",whitelistedSubnets:"",,"logLevel":"INFO"}}'
 
 # or
 camino-network-runner control restart-node \
@@ -379,8 +404,38 @@ camino-network-runner control restart-node \
 --log-level debug \
 --endpoint="0.0.0.0:8080" \
 --node-name node1 \
---caminogo-path /tmp/caminogo-v1.7.3/build/caminogo \
+--caminogo-path /tmp/caminogo-v0.1.0/build/caminogo \
 --whitelisted-subnets=""
+```
+
+To attach a peer to a node:
+
+```bash
+curl -X POST -k http://localhost:8081/v1/control/attachpeer -d '{"nodeName":"node1"}'
+
+# or
+camino-network-runner control attach-peer \
+--request-timeout=3m \
+--log-level debug \
+--endpoint="0.0.0.0:8080" \
+--node-name node1
+```
+
+To send a chit message to the peer:
+
+```bash
+curl -X POST -k http://localhost:8081/v1/control/sendoutboundmessage -d '{"nodeName":"node1","peerId":"7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg","op":16,"bytes":"EAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKgAAAAPpAqmoZkC/2xzQ42wMyYK4Pldl+tX2u+ar3M57WufXx0oXcgXfXCmSnQbbnZQfg9XqmF3jAgFemSUtFkaaZhDbX6Ke1DVpA9rCNkcTxg9X2EcsfdpKXgjYioitjqca7WA="}'
+
+# or
+camino-network-runner control send-outbound-message \
+--request-timeout=3m \
+--log-level debug \
+--endpoint="0.0.0.0:8080" \
+--node-name node1 \
+--peer-id "7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg" \
+--message-op=16 \
+--message-bytes-b64="EAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKgAAAAPpAqmoZkC/2xzQ42wMyYK4Pldl+tX2u+ar3M57WufXx0oXcgXfXCmSnQbbnZQfg9XqmF3jAgFemSUtFkaaZhDbX6Ke1DVpA9rCNkcTxg9X2EcsfdpKXgjYioitjqca7WA=" \
+--message-bytes-throttling false \
 ```
 
 To terminate the cluster:

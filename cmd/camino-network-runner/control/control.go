@@ -5,12 +5,14 @@ package control
 
 import (
 	"context"
+	"encoding/base64"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
 	"github.com/chain4travel/camino-network-runner/client"
+	"github.com/chain4travel/camino-network-runner/local"
 	"github.com/chain4travel/camino-network-runner/pkg/color"
 	"github.com/chain4travel/camino-network-runner/pkg/logutil"
 	"github.com/spf13/cobra"
@@ -47,6 +49,8 @@ func NewCommand() *cobra.Command {
 		newStreamStatusCommand(),
 		newRemoveNodeCommand(),
 		newRestartNodeCommand(),
+		newAttachPeerCommand(),
+		newSendOutboundMessageCommand(),
 		newStopCommand(),
 	)
 
@@ -54,8 +58,9 @@ func NewCommand() *cobra.Command {
 }
 
 var (
-	caminoGoBinPath string
+	caminoGoBinPath    string
 	whitelistedSubnets string
+	numNodes           uint32
 )
 
 func newStartCommand() *cobra.Command {
@@ -69,6 +74,12 @@ func newStartCommand() *cobra.Command {
 		"caminogo-path",
 		"",
 		"caminogo binary path",
+	)
+	cmd.PersistentFlags().Uint32Var(
+		&numNodes,
+		"number-of-nodes",
+		local.DefaultNumNodes,
+		"number of nodes of the network",
 	)
 	cmd.PersistentFlags().StringVar(
 		&whitelistedSubnets,
@@ -91,7 +102,7 @@ func startFunc(cmd *cobra.Command, args []string) error {
 	defer cli.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), requestTimeout)
-	info, err := cli.Start(ctx, caminoGoBinPath, client.WithWhitelistedSubnets(whitelistedSubnets))
+	info, err := cli.Start(ctx, caminoGoBinPath, client.WithNumNodes(numNodes), client.WithWhitelistedSubnets(whitelistedSubnets))
 	cancel()
 	if err != nil {
 		return err
@@ -330,6 +341,109 @@ func restartNodeFunc(cmd *cobra.Command, args []string) error {
 	}
 
 	color.Outf("{{green}}restart node response:{{/}} %+v\n", info)
+	return nil
+}
+
+func newAttachPeerCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "attach-peer [options]",
+		Short: "Attaches a peer to the node.",
+		RunE:  attachPeerFunc,
+	}
+	cmd.PersistentFlags().StringVar(
+		&nodeName,
+		"node-name",
+		"",
+		"node name to attach a peer to",
+	)
+	return cmd
+}
+
+func attachPeerFunc(cmd *cobra.Command, args []string) error {
+	cli, err := client.New(client.Config{
+		LogLevel:    logLevel,
+		Endpoint:    endpoint,
+		DialTimeout: dialTimeout,
+	})
+	if err != nil {
+		return err
+	}
+	defer cli.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), requestTimeout)
+	resp, err := cli.AttachPeer(ctx, nodeName)
+	cancel()
+	if err != nil {
+		return err
+	}
+
+	color.Outf("{{green}}attach peer response:{{/}} %+v\n", resp)
+	return nil
+}
+
+var (
+	peerID      string
+	msgOp       uint32
+	msgBytesB64 string
+)
+
+func newSendOutboundMessageCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "send-outbound-message [options]",
+		Short: "Sends an outbound message to an attached peer.",
+		RunE:  sendOutboundMessageFunc,
+	}
+	cmd.PersistentFlags().StringVar(
+		&nodeName,
+		"node-name",
+		"",
+		"node name that has an attached peer",
+	)
+	cmd.PersistentFlags().StringVar(
+		&peerID,
+		"peer-id",
+		"",
+		"peer ID to send a message to",
+	)
+	cmd.PersistentFlags().Uint32Var(
+		&msgOp,
+		"message-op",
+		0,
+		"Message operation type",
+	)
+	cmd.PersistentFlags().StringVar(
+		&msgBytesB64,
+		"message-bytes-b64",
+		"",
+		"Message bytes in base64 encoding",
+	)
+	return cmd
+}
+
+func sendOutboundMessageFunc(cmd *cobra.Command, args []string) error {
+	cli, err := client.New(client.Config{
+		LogLevel:    logLevel,
+		Endpoint:    endpoint,
+		DialTimeout: dialTimeout,
+	})
+	if err != nil {
+		return err
+	}
+	defer cli.Close()
+
+	b, err := base64.StdEncoding.DecodeString(msgBytesB64)
+	if err != nil {
+		return err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), requestTimeout)
+	resp, err := cli.SendOutboundMessage(ctx, nodeName, peerID, msgOp, b)
+	cancel()
+	if err != nil {
+		return err
+	}
+
+	color.Outf("{{green}}send outbound message response:{{/}} %+v\n", resp)
 	return nil
 }
 

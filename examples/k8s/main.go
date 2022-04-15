@@ -48,8 +48,7 @@ func main() {
 
 func run() error {
 	// Create the logger
-	loggingConfig := logging.DefaultConfig
-	logFactory := logging.NewFactory(loggingConfig)
+	logFactory := logging.NewFactory(logging.DefaultConfig)
 	log, err := logFactory.Make("main")
 	if err != nil {
 		fmt.Println(err)
