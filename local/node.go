@@ -153,7 +153,7 @@ func (node *localNode) AttachPeer(ctx context.Context, router router.InboundHand
 			mc,
 			node.networkID,
 			ip,
-			version.CurrentApp,
+			version.ModuleVersionApp,
 			tlsCert.PrivateKey.(crypto.Signer),
 			ids.Set{},
 			100,

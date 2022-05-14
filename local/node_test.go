@@ -84,7 +84,7 @@ func verifyProtocol(
 		constants.MainnetID,
 		now,
 		myIP,
-		version.CurrentApp.String(),
+		version.ModuleVersionApp.String(),
 		now,
 		signedIP.Signature,
 		[]ids.ID{},

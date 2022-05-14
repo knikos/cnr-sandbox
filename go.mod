@@ -3,8 +3,8 @@ module github.com/chain4travel/camino-network-runner
 go 1.17
 
 require (
-	github.com/chain4travel/caminoethvm v0.0.0-alpha.5
-	github.com/chain4travel/caminogo v0.0.0-alpha.4
+	github.com/chain4travel/caminoethvm v0.1.0
+	github.com/chain4travel/caminogo v0.2.0
 	github.com/chain4travel/caminogo-operator v0.0.0-alpha.5
 	github.com/ethereum/go-ethereum v1.10.16
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.2
@@ -44,7 +44,6 @@ require (
 	github.com/go-ole/go-ole v1.2.1 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/golang-jwt/jwt v3.2.1+incompatible // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
