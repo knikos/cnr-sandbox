@@ -6,6 +6,7 @@ on:
       - chain4travel
   pull_request:
   release:
+      types: [created]
 
 permissions:
   contents: write
@@ -59,7 +60,7 @@ jobs:
   release:
     #needs: [lint_test, unit_test, e2e_test]
     needs: [lint_test, unit_test]
-    if: github.event_name == 'release' && github.event.action == 'created'
+    if: github.event_name == 'release'
     runs-on: ubuntu-latest
     steps:
       - name: Git checkout
