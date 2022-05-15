@@ -24,7 +24,7 @@ import (
 	"github.com/chain4travel/caminogo/snow/networking/router"
 )
 
-// Node represents an CaminoGo node
+// Node represents an Camino node
 type Node interface {
 	// Return this node's name, which is unique
 	// across all the nodes in its network.
@@ -49,7 +49,7 @@ type Node interface {
 	AttachPeer(ctx context.Context, handler router.InboundHandler) (peer.Peer, error)
 }
 
-// Config encapsulates an caminogo configuration
+// Config encapsulates an camino-node configuration
 type Config struct {
 	// Configuration specific to a particular implementation of a node.
 	ImplSpecificConfig json.RawMessage `json:"implSpecificConfig"`

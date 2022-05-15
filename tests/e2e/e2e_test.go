@@ -59,15 +59,15 @@ func init() {
 	)
 	flag.StringVar(
 		&execPath1,
-		"caminogo-path-1",
+		"camino-node-path-1",
 		"",
-		"caminogo executable path (to upgrade from)",
+		"camino-node executable path (to upgrade from)",
 	)
 	flag.StringVar(
 		&execPath2,
-		"caminogo-path-2",
+		"camino-node-path-2",
 		"",
-		"caminogo executable path (to upgrade to)",
+		"camino-node executable path (to upgrade to)",
 	)
 }
 

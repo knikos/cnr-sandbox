@@ -58,7 +58,7 @@ func NewCommand() *cobra.Command {
 }
 
 var (
-	caminoGoBinPath    string
+	caminoNodeBinPath  string
 	whitelistedSubnets string
 	numNodes           uint32
 )
@@ -70,10 +70,10 @@ func newStartCommand() *cobra.Command {
 		RunE:  startFunc,
 	}
 	cmd.PersistentFlags().StringVar(
-		&caminoGoBinPath,
-		"caminogo-path",
+		&caminoNodeBinPath,
+		"camino-node-path",
 		"",
-		"caminogo binary path",
+		"camino-node binary path",
 	)
 	cmd.PersistentFlags().Uint32Var(
 		&numNodes,
@@ -102,7 +102,7 @@ func startFunc(cmd *cobra.Command, args []string) error {
 	defer cli.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), requestTimeout)
-	info, err := cli.Start(ctx, caminoGoBinPath, client.WithNumNodes(numNodes), client.WithWhitelistedSubnets(whitelistedSubnets))
+	info, err := cli.Start(ctx, caminoNodeBinPath, client.WithNumNodes(numNodes), client.WithWhitelistedSubnets(whitelistedSubnets))
 	cancel()
 	if err != nil {
 		return err
@@ -308,10 +308,10 @@ func newRestartNodeCommand() *cobra.Command {
 		"node name to restart",
 	)
 	cmd.PersistentFlags().StringVar(
-		&caminoGoBinPath,
-		"caminogo-path",
+		&caminoNodeBinPath,
+		"camino-node-path",
 		"",
-		"caminogo binary path",
+		"camino-node binary path",
 	)
 	cmd.PersistentFlags().StringVar(
 		&whitelistedSubnets,
@@ -334,7 +334,7 @@ func restartNodeFunc(cmd *cobra.Command, args []string) error {
 	defer cli.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), requestTimeout)
-	info, err := cli.RestartNode(ctx, nodeName, caminoGoBinPath, client.WithWhitelistedSubnets(whitelistedSubnets))
+	info, err := cli.RestartNode(ctx, nodeName, caminoNodeBinPath, client.WithWhitelistedSubnets(whitelistedSubnets))
 	cancel()
 	if err != nil {
 		return err

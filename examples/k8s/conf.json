@@ -5,43 +5,43 @@
   },
   "k8sConfig": [
     {
-      "namespace": "ci-caminogo",
-      "identifier": "caminogo-test-validator-0",
-      "kind": "Caminogo",
-      "apiVersion": "chain.avax.network/v1alpha1",
-      "image": "caminoplatform/caminogo",
+      "namespace": "ci-camino-node",
+      "identifier": "camino-node-test-validator-0",
+      "kind": "CaminoNode",
+      "apiVersion": "chain.camino.foundation/v1alpha1",
+      "image": "c4tplatform/camino-node",
       "tag": "v1.6.4"
     },
     {
-      "namespace": "ci-caminogo",
-      "identifier": "caminogo-test-validator-1",
-      "kind": "Caminogo",
-      "apiVersion": "chain.avax.network/v1alpha1",
-      "image": "caminoplatform/caminogo",
+      "namespace": "ci-camino-node",
+      "identifier": "camino-node-test-validator-1",
+      "kind": "CaminoNode",
+      "apiVersion": "chain.camino.foundation/v1alpha1",
+      "image": "c4tplatform/camino-node",
       "tag": "v1.6.4"
     },
     {
-      "namespace": "ci-caminogo",
-      "identifier": "caminogo-test-validator-2",
-      "kind": "Caminogo",
-      "apiVersion": "chain.avax.network/v1alpha1",
-      "image": "caminoplatform/caminogo",
+      "namespace": "ci-camino-node",
+      "identifier": "camino-node-test-validator-2",
+      "kind": "CaminoNode",
+      "apiVersion": "chain.camino.foundation/v1alpha1",
+      "image": "c4tplatform/camino-node",
       "tag": "v1.6.4"
     },
     {
-      "namespace": "ci-caminogo",
-      "identifier": "caminogo-test-validator-3",
-      "kind": "Caminogo",
-      "apiVersion": "chain.avax.network/v1alpha1",
-      "image": "caminoplatform/caminogo",
+      "namespace": "ci-camino-node",
+      "identifier": "camino-node-test-validator-3",
+      "kind": "CaminoNode",
+      "apiVersion": "chain.camino.foundation/v1alpha1",
+      "image": "c4tplatform/camino-node",
       "tag": "v1.6.4"
     },
     {
-      "namespace": "ci-caminogo",
-      "identifier": "caminogo-test-validator-4",
-      "kind": "Caminogo",
-      "apiVersion": "chain.avax.network/v1alpha1",
-      "image": "caminoplatform/caminogo",
+      "namespace": "ci-camino-node",
+      "identifier": "camino-node-test-validator-4",
+      "kind": "CaminoNode",
+      "apiVersion": "chain.camino.foundation/v1alpha1",
+      "image": "c4tplatform/camino-node",
       "tag": "v1.6.4"
     }
   ]

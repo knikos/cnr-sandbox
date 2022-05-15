@@ -135,7 +135,7 @@ The associated pre-defined configuration is also available to users by calling `
 
 ## Network Interaction
 
-The network runner allows users to interact with an CaminoGo network using the `network.Network` interface:
+The network runner allows users to interact with an Camino network using the `network.Network` interface:
 
 ```go
 // Network is an abstraction of an Camino network
@@ -172,7 +172,7 @@ type Network interface {
 and allows users to interact with a node using the `node.Node` interface:
 
 ```go
-// An CaminoGo node
+// An Camino node
 type Node interface {
     // Return this node's name, which is unique
     // across all the nodes in its network.
@@ -208,7 +208,7 @@ server and executes a set of query and control operations on it.
 To start it, execute inside the cloned directory:
 
 ```sh
-./scripts/tests.e2e.sh CAMINOGO_VERSION1 CAMINOGO_VERSION2
+./scripts/tests.e2e.sh CAMINO_NODE_VERSION1 CAMINO_NODE_VERSION2
 ```
 
 The E2E test checks wheter a node can be restarted with a different binary version. Provide two
@@ -240,7 +240,7 @@ The network runs until the user provides a SIGINT or SIGTERM.
 
 It assumes:
 
-1. You have the latest CaminoGo binaries at `$GOPATH/src/github.com/chain4travel/caminogo/build`. For instructions on setting up CaminoGo, see [here.](https://github.com/chain4travel/caminogo)
+1. You have the latest Camino-Node binaries at `$GOPATH/src/github.com/chain4travel/camino-node/build`. For instructions on setting up Camino-Node, see [here.](https://github.com/chain4travel/camino-node)
 2. The network runner direcory is at `$GOPATH/src/github.com/chain4travel/camino-network-runner`.
 
 To run the demo:
@@ -255,7 +255,7 @@ We've also included another example at `examples/local/fivenodenetwork/main.go`,
 
 **What does `network-runner` do?** The primary focus of [`network-runner`](https://github.com/chain4travel/camino-network-runner) is to create a local network, as a test framework for local development.
 
-**Why `network-runner` as a binary?** Previously, each team was still required to write a substantial amount of Go code to integrate with `network-runner`. And the circular dependency on `caminogo` made it unusable within `caminogo` itself. Using `network-runner` as a binary (rather than Go package) eliminates the complexity of such dependency management.
+**Why `network-runner` as a binary?** Previously, each team was still required to write a substantial amount of Go code to integrate with `network-runner`. Using `network-runner` as a binary (rather than Go package) eliminates the complexity of such dependency management.
 
 **Why `network-runner` needs RPC server?** `network-runner` needs to provide more complex workflow such as replace, restart, inject fail points, etc.. The RPC server will expose basic node operations to enable a separation of concerns such that one team develops test framework, and the other writes test cases and its controlling logic.
 
@@ -295,13 +295,13 @@ To start the server:
 
 ```bash
 # replace with your local path
-curl -X POST -k http://localhost:8081/v1/control/start -d '{"execPath":"/Users/gyuho.lee/go/src/github.com/chain4travel/caminogo/build/caminogo","numNodes":5,"whitelistedSubnets":"24tZhrm8j8GCJRE9PomW8FaeqbgGS4UAQjJnqqn8pq5NwYSYV1","logLevel":"INFO"}'
+curl -X POST -k http://localhost:8081/v1/control/start -d '{"execPath":"/Users/gyuho.lee/go/src/github.com/chain4travel/camino-node/build/camino-node","numNodes":5,"whitelistedSubnets":"24tZhrm8j8GCJRE9PomW8FaeqbgGS4UAQjJnqqn8pq5NwYSYV1","logLevel":"INFO"}'
 
 # or
 camino-network-runner control start \
 --log-level debug \
 --endpoint="0.0.0.0:8080" \
---caminogo-path ${HOME}/go/src/github.com/chain4travel/caminogo/build/caminogo \
+--camino-node-path ${HOME}/go/src/github.com/chain4travel/camino-node/build/camino-node \
 --whitelisted-subnets="24tZhrm8j8GCJRE9PomW8FaeqbgGS4UAQjJnqqn8pq5NwYSYV1"
 ```
 
@@ -366,37 +366,37 @@ To restart a node, download the test binary:
 
 ```bash
 # [optional] download a binary to update
-# https://github.com/chain4travel/caminogo/releases
-VERSION=0.1.0
+# https://github.com/chain4travel/camino-node/releases
+VERSION=0.2.0
 GOARCH=$(go env GOARCH)
 GOOS=$(go env GOOS)
-DOWNLOAD_URL=https://github.com/chain4travel/caminogo/releases/download/v${VERSION}/caminogo-linux-${GOARCH}-v${VERSION}.tar.gz
-DOWNLOAD_PATH=/tmp/caminogo.tar.gz
+DOWNLOAD_URL=https://github.com/chain4travel/camino-node/releases/download/v${VERSION}/camino-node-linux-${GOARCH}-v${VERSION}.tar.gz
+DOWNLOAD_PATH=/tmp/camino-node.tar.gz
 if [[ ${GOOS} == "darwin" ]]; then
-  DOWNLOAD_URL=https://github.com/chain4travel/caminogo/releases/download/v${VERSION}/caminogo-macos-v${VERSION}.zip
-  DOWNLOAD_PATH=/tmp/caminogo.zip
+  DOWNLOAD_URL=https://github.com/chain4travel/camino-node/releases/download/v${VERSION}/camino-node-macos-v${VERSION}.zip
+  DOWNLOAD_PATH=/tmp/camino-node.zip
 fi
 
-rm -rf /tmp/caminogo-v${VERSION}
-rm -rf /tmp/caminogo-build
+rm -rf /tmp/camino-node-v${VERSION}
+rm -rf /tmp/camino-node-build
 rm -f ${DOWNLOAD_PATH}
-echo "downloading caminogo ${VERSION} at ${DOWNLOAD_URL}"
+echo "downloading camino-node ${VERSION} at ${DOWNLOAD_URL}"
 curl -L ${DOWNLOAD_URL} -o ${DOWNLOAD_PATH}
 
-echo "extracting downloaded caminogo"
+echo "extracting downloaded camino-node"
 if [[ ${GOOS} == "linux" ]]; then
   tar xzvf ${DOWNLOAD_PATH} -C /tmp
 elif [[ ${GOOS} == "darwin" ]]; then
-  unzip ${DOWNLOAD_PATH} -d /tmp/caminogo-build
-  mv /tmp/caminogo-build/build /tmp/caminogo-v${VERSION}
+  unzip ${DOWNLOAD_PATH} -d /tmp/camino-node-build
+  mv /tmp/caminogo-build/build /tmp/camino-node-v${VERSION}
 fi
-find /tmp/caminogo-v${VERSION}
+find /tmp/camino-node-v${VERSION}
 ```
 
 To restart a node:
 
 ```bash
-curl -X POST -k http://localhost:8081/v1/control/restartnode -d '{"name":"node1","startRequest":{"execPath":"/tmp/caminogo-v0.1.0/build/caminogo",whitelistedSubnets:"",,"logLevel":"INFO"}}'
+curl -X POST -k http://localhost:8081/v1/control/restartnode -d '{"name":"node1","startRequest":{"execPath":"/tmp/camino-node-v0.1.0/build/camino-node",whitelistedSubnets:"",,"logLevel":"INFO"}}'
 
 # or
 camino-network-runner control restart-node \
@@ -404,7 +404,7 @@ camino-network-runner control restart-node \
 --log-level debug \
 --endpoint="0.0.0.0:8080" \
 --node-name node1 \
---caminogo-path /tmp/caminogo-v0.1.0/build/caminogo \
+--camino-node-path /tmp/camino-node-v0.1.0/build/camino-node \
 --whitelisted-subnets=""
 ```
 

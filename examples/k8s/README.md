@@ -10,12 +10,12 @@ environments.
 This README is *solely* about the kubernetes environment.
 
 ## Overview
-Caminogo is a *stateful* application: It requires a DB and runs with an identity (NodeID).
+Camino-Node is a *stateful* application: It requires a DB and runs with an identity (NodeID).
 Standard Kubernetes is best suited for *stateless* applications.
 
 To allow for stateful applications, the **Operator** pattern has been introduced into the kubernetes world [Operator pattern](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/).
 
-This means that in order to successfully run an caminogo network with this network runner tool on kubernetes, a "domain-specific" implementation of the pattern is required.
+This means that in order to successfully run an camino network with this network runner tool on kubernetes, a "domain-specific" implementation of the pattern is required.
 This implementation can be found at [caminogo-operator](https://github.com/chain4travel/caminogo-operator).
 
 There only needs to be running **1 operator instance** per kubernetes namespace.
@@ -51,7 +51,7 @@ The network runner can then analogously be deployed either via self-contained po
 
 
 ## Local kubernetes environment
-Kubernetes can also be run locally. This is usually only needed for development. In fact, for "normal" caminogo testing and work, it shouldn't be necessary to run a local kubernetes cluster. However, for developing the integration in this repository, it is highly recommended as it speeds up development time.
+Kubernetes can also be run locally. This is usually only needed for development. In fact, for "normal" camino-node testing and work, it shouldn't be necessary to run a local kubernetes cluster. However, for developing the integration in this repository, it is highly recommended as it speeds up development time.
 
 To run a local kubernetes environment:
 
