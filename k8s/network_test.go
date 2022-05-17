@@ -30,7 +30,7 @@ import (
 	"github.com/chain4travel/caminogo/utils/constants"
 	"github.com/chain4travel/caminogo/utils/logging"
 
-	k8sapi "github.com/chain4travel/caminogo-operator/api/v1alpha1"
+	k8sapi "github.com/chain4travel/camino-operator/api/v1alpha1"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -131,7 +131,7 @@ func newMockK8sClient() k8scli.Client {
 	client := &mocks.Client{}
 	client.On("Get", mock.Anything, mock.Anything, mock.Anything).Run(
 		func(args mock.Arguments) {
-			arg := args.Get(2).(*k8sapi.Caminogo)
+			arg := args.Get(2).(*k8sapi.Camino)
 			arg.Status.NetworkMembersURI = []string{"localhost"}
 		}).Return(nil)
 	client.On("Delete", mock.Anything, mock.Anything, mock.Anything).Return(nil)
