@@ -17,7 +17,7 @@ import (
 
 	"github.com/chain4travel/camino-network-runner/api"
 	"github.com/chain4travel/camino-network-runner/network/node"
-	k8sapi "github.com/chain4travel/caminogo-operator/api/v1alpha1"
+	k8sapi "github.com/chain4travel/camino-operator/api/v1alpha1"
 	"github.com/chain4travel/caminogo/ids"
 	"github.com/chain4travel/caminogo/network/peer"
 	"github.com/chain4travel/caminogo/snow/networking/router"
@@ -47,7 +47,7 @@ type Node struct {
 	// Use to send API calls to this node
 	apiClient api.Client
 	// K8s description of this node
-	k8sObjSpec *k8sapi.Caminogo
+	k8sObjSpec *k8sapi.Camino
 }
 
 // AttachPeer see Network
@@ -89,6 +89,6 @@ func (n *Node) GetAPIPort() uint16 {
 
 // GetK8sObjSpec returns the kubernetes object spec
 // representation of this node
-func (n *Node) GetK8sObjSpec() *k8sapi.Caminogo {
+func (n *Node) GetK8sObjSpec() *k8sapi.Camino {
 	return n.k8sObjSpec
 }

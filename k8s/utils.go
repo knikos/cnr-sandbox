@@ -20,7 +20,7 @@ import (
 
 	"github.com/chain4travel/camino-network-runner/network/node"
 	"github.com/chain4travel/camino-network-runner/utils"
-	k8sapi "github.com/chain4travel/caminogo-operator/api/v1alpha1"
+	k8sapi "github.com/chain4travel/camino-operator/api/v1alpha1"
 	"github.com/chain4travel/caminogo/config"
 	"github.com/chain4travel/caminogo/utils/logging"
 	corev1 "k8s.io/api/core/v1"
@@ -97,7 +97,7 @@ func buildNodeEnv(log logging.Logger, genesis []byte, c node.Config) ([]corev1.E
 }
 
 // Takes a node's config and genesis and returns the node as a k8s object spec
-func buildK8sObjSpec(log logging.Logger, genesis []byte, c node.Config) (*k8sapi.Caminogo, error) {
+func buildK8sObjSpec(log logging.Logger, genesis []byte, c node.Config) (*k8sapi.Camino, error) {
 	env, err := buildNodeEnv(log, genesis, c)
 	if err != nil {
 		return nil, err
@@ -117,7 +117,7 @@ func buildK8sObjSpec(log logging.Logger, genesis []byte, c node.Config) (*k8sapi
 		return nil, err
 	}
 
-	return &k8sapi.Caminogo{
+	return &k8sapi.Camino{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       k8sConf.Kind,
 			APIVersion: k8sConf.APIVersion,
@@ -126,7 +126,7 @@ func buildK8sObjSpec(log logging.Logger, genesis []byte, c node.Config) (*k8sapi
 			Name:      k8sConf.Identifier,
 			Namespace: k8sConf.Namespace,
 		},
-		Spec: k8sapi.CaminogoSpec{
+		Spec: k8sapi.CaminoSpec{
 			BootstrapperURL: "",
 			DeploymentName:  k8sConf.Identifier,
 			Image:           k8sConf.Image,
@@ -158,7 +158,7 @@ func validateObjectSpec(k8sobj ObjectSpec) error {
 	case k8sobj.APIVersion == "":
 		return errors.New("APIVersion should not be empty")
 	case k8sobj.Kind != "Caminogo":
-		// only "CaminoGo" currently supported -- mandated by caminogo-operator
+		// only "CaminoGo" currently supported -- mandated by camino-operator
 		return fmt.Errorf("expected \"Caminogo\" but got %q", k8sobj.Kind)
 	case k8sobj.Namespace == "":
 		return errors.New("namespace should be defined to avoid unintended consequences")
@@ -172,9 +172,9 @@ func validateObjectSpec(k8sobj ObjectSpec) error {
 // Takes the genesis of a network and node configs and returns:
 // 1) The beacon nodes
 // 2) The non-beacon nodes
-// as caminogo-operator compatible descriptions.
+// as camino-operator compatible descriptions.
 // May return nil slices.
-func createDeploymentFromConfig(params networkParams) ([]*k8sapi.Caminogo, []*k8sapi.Caminogo, error) {
+func createDeploymentFromConfig(params networkParams) ([]*k8sapi.Camino, []*k8sapi.Camino, error) {
 	// Give each flag in the network config to each node's config.
 	// If a flag is defined in both the network config and the node config,
 	// the value given in the node config takes precedence.
@@ -196,7 +196,7 @@ func createDeploymentFromConfig(params networkParams) ([]*k8sapi.Caminogo, []*k8
 		}
 	}
 
-	var beacons, nonBeacons []*k8sapi.Caminogo
+	var beacons, nonBeacons []*k8sapi.Camino
 	names := make(map[string]struct{})
 	for _, nodeConfig := range params.conf.NodeConfigs {
 		spec, err := buildK8sObjSpec(params.log, []byte(params.conf.Genesis), nodeConfig)
