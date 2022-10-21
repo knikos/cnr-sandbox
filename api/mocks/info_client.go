@@ -17,8 +17,8 @@ import (
 	context "context"
 
 	info "github.com/chain4travel/caminogo/api/info"
-	rpc "github.com/chain4travel/caminogo/utils/rpc"
 	ids "github.com/chain4travel/caminogo/ids"
+	rpc "github.com/chain4travel/caminogo/utils/rpc"
 	mock "github.com/stretchr/testify/mock"
 )
 

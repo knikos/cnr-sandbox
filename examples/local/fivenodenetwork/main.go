@@ -66,7 +66,7 @@ func main() {
 	if goPath == "" {
 		goPath = build.Default.GOPATH
 	}
-	binaryPath := fmt.Sprintf("%s%s", goPath, "/src/github.com/chain4travel/caminogo/build/caminogo")
+	binaryPath := fmt.Sprintf("%s%s", goPath, "/src/github.com/chain4travel/camino-node/build/camino-node")
 	if err := run(log, binaryPath); err != nil {
 		log.Fatal("%s", err)
 		os.Exit(1)

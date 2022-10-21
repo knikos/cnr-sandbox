@@ -17,10 +17,10 @@ import (
 	"math/big"
 	"sync"
 
-	"github.com/chain4travel/caminogo/ids"
 	"github.com/chain4travel/caminoethvm/core/types"
 	"github.com/chain4travel/caminoethvm/ethclient"
 	"github.com/chain4travel/caminoethvm/interfaces"
+	"github.com/chain4travel/caminogo/ids"
 	"github.com/ethereum/go-ethereum/common"
 )
 
