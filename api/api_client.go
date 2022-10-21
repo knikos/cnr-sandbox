@@ -14,6 +14,7 @@ package api
 import (
 	"fmt"
 
+	"github.com/chain4travel/caminoethvm/plugin/evm"
 	"github.com/chain4travel/caminogo/api/admin"
 	"github.com/chain4travel/caminogo/api/health"
 	"github.com/chain4travel/caminogo/api/info"
@@ -22,7 +23,6 @@ import (
 	"github.com/chain4travel/caminogo/indexer"
 	"github.com/chain4travel/caminogo/vms/avm"
 	"github.com/chain4travel/caminogo/vms/platformvm"
-	"github.com/chain4travel/caminoethvm/plugin/evm"
 )
 
 // interface compliance

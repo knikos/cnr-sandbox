@@ -10,7 +10,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"os"
@@ -214,7 +213,7 @@ func (s *server) Start(ctx context.Context, req *rpcpb.StartRequest) (*rpcpb.Sta
 		err                error
 	)
 	if len(rootDataDir) == 0 {
-		rootDataDir, err = ioutil.TempDir(os.TempDir(), "network-runner-root-data")
+		rootDataDir, err = os.MkdirTemp(os.TempDir(), "network-runner-root-data")
 		if err != nil {
 			return nil, err
 		}
