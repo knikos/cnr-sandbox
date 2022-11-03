@@ -1,4 +1,4 @@
-# Avalanche Network Runner
+# Camino Network Runner
 
 ## Note
 
@@ -6,7 +6,7 @@ This tool is under heavy development and the documentation/code snippets below m
 
 ## Overview
 
-This is a tool to run and interact with a local Avalanche network.
+This is a tool to run and interact with a local Camino network.
 This tool may be especially useful for development and testing.
 
 ## Installation
@@ -18,7 +18,7 @@ This is the preferred way. Does not require golang to be installed on the system
 To download a binary for the latest release, run:
 
 ```sh
-curl -sSfL https://raw.githubusercontent.com/ava-labs/avalanche-network-runner/main/scripts/install.sh | sh -s
+curl -sSfL https://raw.githubusercontent.com/ava-labs/camino-network-runner/main/scripts/install.sh | sh -s
 ```
 
 The binary will be installed inside the `./bin` directory (relative to where the install command was run).
@@ -39,7 +39,7 @@ To add it to your path permanently, add an export command to your shell initiali
 To download the binary into a specific directory, run:
 
 ```sh
-curl -sSfL https://raw.githubusercontent.com/ava-labs/avalanche-network-runner/main/scripts/install.sh | sh -s -- -b <relative directory>
+curl -sSfL https://raw.githubusercontent.com/ava-labs/camino-network-runner/main/scripts/install.sh | sh -s -- -b <relative directory>
 ```
 
 ### Install using golang
@@ -47,16 +47,16 @@ curl -sSfL https://raw.githubusercontent.com/ava-labs/avalanche-network-runner/m
 Requires golang to be installed on the system ([https://go.dev/doc/install](https://go.dev/doc/install)).
 
 ```sh
-go install github.com/ava-labs/avalanche-network-runner@latest
+go install github.com/chain4travel/camino-network-runner@latest
 ```
 
-After that, the `avalanche-network-runner` binary should be present under the `$HOME/go/bin/` directory. Consider adding this directory to the `PATH` environment variable.
+After that, the `camino-network-runner` binary should be present under the `$HOME/go/bin/` directory. Consider adding this directory to the `PATH` environment variable.
 
 ### Install by release download
 
 Does not require golang to be installed on the system.
 
-Download the desired distribution from [https://github.com/ava-labs/avalanche-network-runner/releases](https://github.com/ava-labs/avalanche-network-runner/releases).
+Download the desired distribution from [https://github.com/chain4travel/camino-network-runner/releases](https://github.com/chain4travel/camino-network-runner/releases).
 
 Uncompress and locate where is convenient. Consider adding the target bin directory to the `PATH` environment variable.
 
@@ -65,7 +65,7 @@ Uncompress and locate where is convenient. Consider adding the target bin direct
 #### Download
 
 ```sh
-git clone https://github.com/ava-labs/avalanche-network-runner.git
+git clone https://github.com/chain4travel/camino-network-runner.git
 ```
 
 #### Install
@@ -76,7 +76,7 @@ From inside the cloned directory:
 go install
 ```
 
-After that, `avalanche-network-runner` binary should be present under `$HOME/go/bin/` directory. Consider adding this directory to the `PATH` environment variable.
+After that, `camino-network-runner` binary should be present under `$HOME/go/bin/` directory. Consider adding this directory to the `PATH` environment variable.
 
 #### Run Unit Tests
 
@@ -88,13 +88,13 @@ go test ./...
 
 #### Run E2E tests
 
-The E2E test checks `avalanche-network-runner` RPC communication and control. It starts a network against a fresh RPC
+The E2E test checks `camino-network-runner` RPC communication and control. It starts a network against a fresh RPC
 server and executes a set of query and control operations on it.
 
 To start it, execute inside the cloned directory:
 
 ```sh
-./scripts/tests.e2e.sh AVALANCHEGO_VERSION1 AVALANCHEGO_VERSION2
+./scripts/tests.e2e.sh CAMINO_NODE_VERSION1 CAMINO_NODE_VERSION2
 ```
 
 The E2E test checks whether a node can be restarted with a different binary version. Provide two
@@ -111,11 +111,11 @@ To specify that the E2E test should be run with `go test`, set environment varia
 This environment variable is correctly set when executing `./scripts/tests.e2e.sh`, but the user should consider
 setting it if trying to execute E2E tests without using that script.
 
-## Using `avalanche-network-runner`
+## Using `camino-network-runner`
 
-You can import this repository as a library in your Go program, but we recommend running `avalanche-network-runner` as a binary. This creates an RPC server that you can send requests to in order to start a network, add nodes to the network, remove nodes from the network, restart nodes, etc.. You can make requests through the `avalanche-network-runner` command or by making API calls. Requests are "translated" into gRPC and sent to the server.
+You can import this repository as a library in your Go program, but we recommend running `camino-network-runner` as a binary. This creates an RPC server that you can send requests to in order to start a network, add nodes to the network, remove nodes from the network, restart nodes, etc.. You can make requests through the `camino-network-runner` command or by making API calls. Requests are "translated" into gRPC and sent to the server.
 
-**Why does `avalanche-network-runner` need an RPC server?** `avalanche-network-runner` needs to provide complex workflows such as replacing nodes, restarting nodes, injecting fail points, etc.. The RPC server exposes basic operations to enable a separation of concerns such that one team develops a test framework, and the other writes test cases and controlling logic.
+**Why does `camino-network-runner` need an RPC server?** `camino-network-runner` needs to provide complex workflows such as replacing nodes, restarting nodes, injecting fail points, etc.. The RPC server exposes basic operations to enable a separation of concerns such that one team develops a test framework, and the other writes test cases and controlling logic.
 
 **Why gRPC?** The RPC server leads to more modular test components, and gRPC enables greater flexibility. The protocol buffer increases flexibility as we develop more complicated test cases. And gRPC opens up a variety of different approaches for how to write test controller (e.g., Rust). See [`rpcpb/rpc.proto`](./rpcpb/rpc.proto) for service definition.
 
@@ -126,7 +126,7 @@ You can import this repository as a library in your Go program, but we recommend
 To start the server:
 
 ```bash
-avalanche-network-runner server \
+camino-network-runner server \
 --log-level debug \
 --port=":8080" \
 --grpc-gateway-port=":8081"
@@ -142,26 +142,26 @@ To ping the server:
 curl -X POST -k http://localhost:8081/v1/ping -d ''
 
 # or
-avalanche-network-runner ping \
+camino-network-runner ping \
 --log-level debug \
 --endpoint="0.0.0.0:8080"
 ```
 
-To start a new Avalanche network with five nodes (a cluster):
+To start a new Camino network with five nodes (a cluster):
 
 ```bash
-# replace execPath with the path to AvalancheGo on your machine
-# e.g., ${HOME}/go/src/github.com/ava-labs/avalanchego/build/avalanchego
-AVALANCHEGO_EXEC_PATH="avalanchego"
+# replace execPath with the path to CaminoNode on your machine
+# e.g., ${HOME}/go/src/github.com/chain4travel/camino-node/build/camino-node
+CAMINO_NODE_EXEC_PATH="camino-node"
 
-curl -X POST -k http://localhost:8081/v1/control/start -d '{"execPath":"'${AVALANCHEGO_EXEC_PATH}'","numNodes":5,"logLevel":"INFO"}'
+curl -X POST -k http://localhost:8081/v1/control/start -d '{"execPath":"'${CAMINO_NODE_EXEC_PATH}'","numNodes":5,"logLevel":"INFO"}'
 
 # or
-avalanche-network-runner control start \
+camino-network-runner control start \
 --log-level debug \
 --endpoint="0.0.0.0:8080" \
 --number-of-nodes=5 \
---avalanchego-path ${AVALANCHEGO_EXEC_PATH}
+--camino-node ${CAMINO_NODE_EXEC_PATH}
 ```
 
 Additional optional parameters which can be passed to the start command:
@@ -178,11 +178,11 @@ For example, to set `avalanchego --http-host` flag for all nodes:
 ```bash
 # to expose local RPC server to all traffic
 # (e.g., run network runner within cloud instance)
-curl -X POST -k http://localhost:8081/v1/control/start -d '{"execPath":"'${AVALANCHEGO_EXEC_PATH}'","globalNodeConfig":"{\"http-host\":\"0.0.0.0\"}"}'
+curl -X POST -k http://localhost:8081/v1/control/start -d '{"execPath":"'${CAMINO_NODE_EXEC_PATH}'","globalNodeConfig":"{\"http-host\":\"0.0.0.0\"}"}'
 
 # or
-avalanche-network-runner control start \
---avalanchego-path ${AVALANCHEGO_EXEC_PATH} \
+camino-network-runner control start \
+--camino-node ${CAMINO_NODE_EXEC_PATH} \
 --global-node-config '{"http-host":"0.0.0.0"}'
 ```
 
@@ -214,7 +214,7 @@ Example usage of `--custom-node-configs` to get deterministic API port numbers:
 
 ```bash
 curl -X POST -k http://localhost:8081/v1/control/start -d\
-'{"execPath":"'${AVALANCHEGO_EXEC_PATH}'","customNodeConfigs":
+'{"execPath":"'${CAMINO_NODE_EXEC_PATH}'","customNodeConfigs":
 {
 "node1":"{\"http-port\":9650}",
 "node2":"{\"http-port\":9652}",
@@ -225,8 +225,8 @@ curl -X POST -k http://localhost:8081/v1/control/start -d\
 }'
 
 # or
-avalanche-network-runner control start \
---avalanchego-path ${AVALANCHEGO_EXEC_PATH} \
+camino-network-runner control start \
+--camino-node ${CAMINO_NODE_EXEC_PATH} \
 --custom-node-configs \
 '{
 "node1":"{\"http-port\":9650}",
@@ -245,7 +245,7 @@ To wait for all the nodes in the cluster to become healthy:
 curl -X POST -k http://localhost:8081/v1/control/health -d ''
 
 # or
-avalanche-network-runner control health \
+camino-network-runner control health \
 --log-level debug \
 --endpoint="0.0.0.0:8080"
 ```
@@ -256,7 +256,7 @@ To get the API endpoints of all nodes in the cluster:
 curl -X POST -k http://localhost:8081/v1/control/uris -d ''
 
 # or
-avalanche-network-runner control uris \
+camino-network-runner control uris \
 --log-level debug \
 --endpoint="0.0.0.0:8080"
 ```
@@ -267,7 +267,7 @@ To query the cluster status from the server:
 curl -X POST -k http://localhost:8081/v1/control/status -d ''
 
 # or
-avalanche-network-runner control status \
+camino-network-runner control status \
 --log-level debug \
 --endpoint="0.0.0.0:8080"
 ```
@@ -275,7 +275,7 @@ avalanche-network-runner control status \
 To stream cluster status:
 
 ```bash
-avalanche-network-runner control \
+camino-network-runner control \
 --request-timeout=3m \
 stream-status \
 --push-interval=5s \
@@ -289,7 +289,7 @@ To save the network to a snapshot:
 curl -X POST -k http://localhost:8081/v1/control/savesnapshot -d '{"snapshot_name":"node5"}'
 
 # or
-avalanche-network-runner control save-snapshot snapshotName
+camino-network-runner control save-snapshot snapshotName
 ```
 
 To load a network from a snapshot:
@@ -298,17 +298,17 @@ To load a network from a snapshot:
 curl -X POST -k http://localhost:8081/v1/control/loadsnapshot -d '{"snapshot_name":"node5"}'
 
 # or
-avalanche-network-runner control load-snapshot snapshotName
+camino-network-runner control load-snapshot snapshotName
 ```
 
 An avalanchego binary path and/or plugin dir can be specified when loading the snapshot. This is
 optional. If not specified, will use the paths saved with the snapshot:
 
 ```bash
-curl -X POST -k http://localhost:8081/v1/control/loadsnapshot -d '{"snapshot_name":"node5","execPath":"'${AVALANCHEGO_EXEC_PATH}'","pluginDir":"'${AVALANCHEGO_PLUGIN_PATH}'"}'
+curl -X POST -k http://localhost:8081/v1/control/loadsnapshot -d '{"snapshot_name":"node5","execPath":"'${CAMINO_NODE_EXEC_PATH}'","pluginDir":"'${AVALANCHEGO_PLUGIN_PATH}'"}'
 
 # or
-avalanche-network-runner control load-snapshot snapshotName --avalanchego-path ${AVALANCHEGO_EXEC_PATH} --plugin-dir ${AVALANCHEGO_PLUGIN_PATH}
+camino-network-runner control load-snapshot snapshotName --camino-node ${CAMINO_NODE_EXEC_PATH} --plugin-dir ${AVALANCHEGO_PLUGIN_PATH}
 ```
 
 To get the list of snapshots:
@@ -317,7 +317,7 @@ To get the list of snapshots:
 curl -X POST -k http://localhost:8081/v1/control/getsnapshotnames
 
 # or
-avalanche-network-runner control get-snapshot-names
+camino-network-runner control get-snapshot-names
 ```
 
 To remove a snapshot:
@@ -326,7 +326,7 @@ To remove a snapshot:
 curl -X POST -k http://localhost:8081/v1/control/removesnapshot -d '{"snapshot_name":"node5"}'
 
 # or
-avalanche-network-runner control remove-snapshot snapshotName
+camino-network-runner control remove-snapshot snapshotName
 ```
 
 To create N validated subnets (requires network restart):
@@ -335,7 +335,7 @@ To create N validated subnets (requires network restart):
 curl -X POST -k http://localhost:8081/v1/control/createsubnets -d '{"num_subnets":5}'
 
 # or
-avalanche-network-runner control create-subnets 5
+camino-network-runner control create-subnets 5
 ```
 
 To create a blockchain without a subnet id (requires network restart):
@@ -344,7 +344,7 @@ To create a blockchain without a subnet id (requires network restart):
 curl -X POST -k http://localhost:8081/v1/control/createblockchains -d '{"pluginDir":"'$PLUGIN_DIR'","blockchainSpecs":[{"vm_name":"'$VM_NAME'","genesis":"'$GENESIS_PATH'"}]}'
 
 # or
-avalanche-network-runner control create-blockchains '[{"vm_name":"'$VM_NAME'","genesis":"'$GENESIS_PATH'"}]' --plugin-dir $PLUGIN_DIR
+camino-network-runner control create-blockchains '[{"vm_name":"'$VM_NAME'","genesis":"'$GENESIS_PATH'"}]' --plugin-dir $PLUGIN_DIR
 ```
 
 To create a blockchain with a subnet id (does not require restart):
@@ -353,7 +353,7 @@ To create a blockchain with a subnet id (does not require restart):
 curl -X POST -k http://localhost:8081/v1/control/createblockchains -d '{"pluginDir":"'$PLUGIN_DIR'","blockchainSpecs":[{"vm_name":"'$VM_NAME'","genesis":"'$GENESIS_PATH'", "subnet_id": "'$SUBNET_ID'"}]}'
 
 # or
-avalanche-network-runner control create-blockchains '[{"vm_name":"'$VM_NAME'","genesis":"'$GENESIS_PATH'", "subnet_id": "'$SUBNET_ID'"}]' --plugin-dir $PLUGIN_DIR
+camino-network-runner control create-blockchains '[{"vm_name":"'$VM_NAME'","genesis":"'$GENESIS_PATH'", "subnet_id": "'$SUBNET_ID'"}]' --plugin-dir $PLUGIN_DIR
 ```
 
 To create a blockchain with a subnet id, and both chain config and network upgrade file paths (requires network restart):
@@ -362,7 +362,7 @@ To create a blockchain with a subnet id, and both chain config and network upgra
 curl -X POST -k http://localhost:8081/v1/control/createblockchains -d '{"pluginDir":"'$PLUGIN_DIR'","blockchainSpecs":[{"vm_name":"'$VM_NAME'","genesis":"'$GENESIS_PATH'", "subnet_id": "'$SUBNET_ID'", "chain_config": "'$CHAIN_CONFIG_PATH'", "network_upgrade": "'$NETWORK_UPGRADE_PATH'"}]}'
 
 # or
-avalanche-network-runner control create-blockchains '[{"vm_name":"'$VM_NAME'","genesis":"'$GENESIS_PATH'", "subnet_id": "'$SUBNET_ID'", "chain_config": "'$CHAIN_CONFIG_PATH'", "network_upgrade": "'$NETWORK_UPGRADE_PATH'"}]' --plugin-dir $PLUGIN_DIR
+camino-network-runner control create-blockchains '[{"vm_name":"'$VM_NAME'","genesis":"'$GENESIS_PATH'", "subnet_id": "'$SUBNET_ID'", "chain_config": "'$CHAIN_CONFIG_PATH'", "network_upgrade": "'$NETWORK_UPGRADE_PATH'"}]' --plugin-dir $PLUGIN_DIR
 ```
 
 To remove (stop) a node:
@@ -371,7 +371,7 @@ To remove (stop) a node:
 curl -X POST -k http://localhost:8081/v1/control/removenode -d '{"name":"node5"}'
 
 # or
-avalanche-network-runner control remove-node \
+camino-network-runner control remove-node \
 --request-timeout=3m \
 --log-level debug \
 --endpoint="0.0.0.0:8080" \
@@ -382,38 +382,38 @@ To restart a node (in this case, the one named `node1`):
 
 ```bash
 # e.g., ${HOME}/go/src/github.com/ava-labs/avalanchego/build/avalanchego
-AVALANCHEGO_EXEC_PATH="avalanchego"
+CAMINO_NODE_EXEC_PATH="avalanchego"
 
 # Note that you can restart the node with a different binary by providing
 # a different execPath
-curl -X POST -k http://localhost:8081/v1/control/restartnode -d '{"name":"node1","execPath":"'${AVALANCHEGO_EXEC_PATH}'","logLevel":"INFO"}'
+curl -X POST -k http://localhost:8081/v1/control/restartnode -d '{"name":"node1","execPath":"'${CAMINO_NODE_EXEC_PATH}'","logLevel":"INFO"}'
 
 # or
-avalanche-network-runner control restart-node \
+camino-network-runner control restart-node \
 --request-timeout=3m \
 --log-level debug \
 --endpoint="0.0.0.0:8080" \
 --node-name node1 \
---avalanchego-path ${AVALANCHEGO_EXEC_PATH}
+--camino-node ${CAMINO_NODE_EXEC_PATH}
 ```
 
 To add a node (in this case, a new node named `node99`):
 
 ```bash
 # e.g., ${HOME}/go/src/github.com/ava-labs/avalanchego/build/avalanchego
-AVALANCHEGO_EXEC_PATH="avalanchego"
+CAMINO_NODE_EXEC_PATH="avalanchego"
 
 # Note that you can add the new node with a different binary by providing
 # a different execPath
-curl -X POST -k http://localhost:8081/v1/control/addnode -d '{"name":"node99","execPath":"'${AVALANCHEGO_EXEC_PATH}'","logLevel":"INFO"}'
+curl -X POST -k http://localhost:8081/v1/control/addnode -d '{"name":"node99","execPath":"'${CAMINO_NODE_EXEC_PATH}'","logLevel":"INFO"}'
 
 # or
-avalanche-network-runner control add-node \
+camino-network-runner control add-node \
 --request-timeout=3m \
 --log-level debug \
 --endpoint="0.0.0.0:8080" \
 --node-name node99 \
---avalanchego-path ${AVALANCHEGO_EXEC_PATH}
+--camino-node ${CAMINO_NODE_EXEC_PATH}
 ```
 
 You can also provide additional flags that specify the node's config:
@@ -438,7 +438,7 @@ To attach a test peer to a node (in this case, `node1`):
 curl -X POST -k http://localhost:8081/v1/control/attachpeer -d '{"nodeName":"node1"}'
 
 # or
-avalanche-network-runner control attach-peer \
+camino-network-runner control attach-peer \
 --request-timeout=3m \
 --log-level debug \
 --endpoint="0.0.0.0:8080" \
@@ -451,7 +451,7 @@ To send a chit message to the node through the test peer:
 curl -X POST -k http://localhost:8081/v1/control/sendoutboundmessage -d '{"nodeName":"node1","peerId":"7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg","op":16,"bytes":"EAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKgAAAAPpAqmoZkC/2xzQ42wMyYK4Pldl+tX2u+ar3M57WufXx0oXcgXfXCmSnQbbnZQfg9XqmF3jAgFemSUtFkaaZhDbX6Ke1DVpA9rCNkcTxg9X2EcsfdpKXgjYioitjqca7WA="}'
 
 # or
-avalanche-network-runner control send-outbound-message \
+camino-network-runner control send-outbound-message \
 --request-timeout=3m \
 --log-level debug \
 --endpoint="0.0.0.0:8080" \
@@ -467,7 +467,7 @@ To terminate the cluster:
 curl -X POST -k http://localhost:8081/v1/control/stop -d ''
 
 # or
-avalanche-network-runner control stop \
+camino-network-runner control stop \
 --log-level debug \
 --endpoint="0.0.0.0:8080"
 ```
@@ -477,7 +477,7 @@ avalanche-network-runner control stop \
 To start the server:
 
 ```bash
-avalanche-network-runner server \
+camino-network-runner server \
 --log-level debug \
 --port=":8080" \
 --grpc-gateway-port=":8081"
@@ -567,16 +567,16 @@ cat /tmp/subnet-evm.genesis.json
 
 ```bash
 # replace execPath with the path to AvalancheGo on your machine
-AVALANCHEGO_EXEC_PATH="${HOME}/go/src/github.com/ava-labs/avalanchego/build/avalanchego"
+CAMINO_NODE_EXEC_PATH="${HOME}/go/src/github.com/ava-labs/avalanchego/build/avalanchego"
 AVALANCHEGO_PLUGIN_PATH="${HOME}/go/src/github.com/ava-labs/avalanchego/build/plugins"
 
-curl -X POST -k http://localhost:8081/v1/control/start -d '{"execPath":"'${AVALANCHEGO_EXEC_PATH}'","numNodes":5,"logLevel":"INFO","pluginDir":"'${AVALANCHEGO_PLUGIN_PATH}'","blockchainSpecs":[{"vm_name":"subnetevm","genesis":"/tmp/subnet-evm.genesis.json"}]}'
+curl -X POST -k http://localhost:8081/v1/control/start -d '{"execPath":"'${CAMINO_NODE_EXEC_PATH}'","numNodes":5,"logLevel":"INFO","pluginDir":"'${AVALANCHEGO_PLUGIN_PATH}'","blockchainSpecs":[{"vm_name":"subnetevm","genesis":"/tmp/subnet-evm.genesis.json"}]}'
 
 # or
-avalanche-network-runner control start \
+camino-network-runner control start \
 --log-level debug \
 --endpoint="0.0.0.0:8080" \
---avalanchego-path ${AVALANCHEGO_EXEC_PATH} \
+--camino-node ${CAMINO_NODE_EXEC_PATH} \
 --plugin-dir ${AVALANCHEGO_PLUGIN_PATH} \
 --blockchain-specs '[{"vm_name": "subnetevm", "genesis": "/tmp/subnet-evm.genesis.json"}]'
 ```
@@ -589,13 +589,13 @@ curl -X POST -k http://localhost:8081/v1/control/status -d ''
 Blockchain config file and network upgrade file paths can be optionally specified at network start, eg:
 
 ```bash
-curl -X POST -k http://localhost:8081/v1/control/start -d '{"execPath":"'${AVALANCHEGO_EXEC_PATH}'","numNodes":5,"logLevel":"INFO","pluginDir":"'${AVALANCHEGO_PLUGIN_PATH}'","blockchainSpecs":[{"vm_name":"subnetevm","genesis":"/tmp/subnet-evm.genesis.json","chain_config":"'$CHAIN_CONFIG_PATH'","network_upgrade":"'$NETWORK_UPGRADE_PATH'"}]}'
+curl -X POST -k http://localhost:8081/v1/control/start -d '{"execPath":"'${CAMINO_NODE_EXEC_PATH}'","numNodes":5,"logLevel":"INFO","pluginDir":"'${AVALANCHEGO_PLUGIN_PATH}'","blockchainSpecs":[{"vm_name":"subnetevm","genesis":"/tmp/subnet-evm.genesis.json","chain_config":"'$CHAIN_CONFIG_PATH'","network_upgrade":"'$NETWORK_UPGRADE_PATH'"}]}'
 
 # or
-avalanche-network-runner control start \
+camino-network-runner control start \
 --log-level debug \
 --endpoint="0.0.0.0:8080" \
---avalanchego-path ${AVALANCHEGO_EXEC_PATH} \
+--camino-node ${CAMINO_NODE_EXEC_PATH} \
 --plugin-dir ${AVALANCHEGO_PLUGIN_PATH} \
 --blockchain-specs '[{"vm_name": "subnetevm", "genesis": "/tmp/subnet-evm.genesis.json", "chain_config": "'$CHAIN_CONFIG_PATH'", "network_upgrade": "'$NETWORK_UPGRADE_PATH'"}]'
 ```
@@ -605,7 +605,7 @@ avalanche-network-runner control start \
 To start the server:
 
 ```bash
-avalanche-network-runner server \
+camino-network-runner server \
 --log-level debug \
 --port=":8080" \
 --grpc-gateway-port=":8081"
@@ -653,16 +653,16 @@ cat /tmp/blobvm.genesis.json
 
 ```bash
 # replace execPath with the path to AvalancheGo on your machine
-AVALANCHEGO_EXEC_PATH="${HOME}/go/src/github.com/ava-labs/avalanchego/build/avalanchego"
+CAMINO_NODE_EXEC_PATH="${HOME}/go/src/github.com/ava-labs/avalanchego/build/avalanchego"
 AVALANCHEGO_PLUGIN_PATH="${HOME}/go/src/github.com/ava-labs/avalanchego/build/plugins"
 
-curl -X POST -k http://localhost:8081/v1/control/start -d '{"execPath":"'${AVALANCHEGO_EXEC_PATH}'","numNodes":5,"logLevel":"INFO","pluginDir":"'${AVALANCHEGO_PLUGIN_PATH}'","blockchainSpecs":[{"vm_name":"blobvm","genesis":"/tmp/blobvm.genesis.json"}]}'
+curl -X POST -k http://localhost:8081/v1/control/start -d '{"execPath":"'${CAMINO_NODE_EXEC_PATH}'","numNodes":5,"logLevel":"INFO","pluginDir":"'${AVALANCHEGO_PLUGIN_PATH}'","blockchainSpecs":[{"vm_name":"blobvm","genesis":"/tmp/blobvm.genesis.json"}]}'
 
 # or
-avalanche-network-runner control start \
+camino-network-runner control start \
 --log-level debug \
 --endpoint="0.0.0.0:8080" \
---avalanchego-path ${AVALANCHEGO_EXEC_PATH} \
+--camino-node ${CAMINO_NODE_EXEC_PATH} \
 --plugin-dir ${AVALANCHEGO_PLUGIN_PATH} \
 --blockchain-specs '[{"vm_name": "blobvm", "genesis": "/tmp/blobvm.genesis.json"}]'
 ```
@@ -675,13 +675,13 @@ curl -X POST -k http://localhost:8081/v1/control/status -d ''
 Blockchain config file and network upgrade file paths can be optionally specified at network start, eg:
 
 ```bash
-curl -X POST -k http://localhost:8081/v1/control/start -d '{"execPath":"'${AVALANCHEGO_EXEC_PATH}'","numNodes":5,"logLevel":"INFO","pluginDir":"'${AVALANCHEGO_PLUGIN_PATH}'","blockchainSpecs":[{"vm_name":"blobvm","genesis":"/tmp/blobvm.json","chain_config":"'$CHAIN_CONFIG_PATH'","network_upgrade":"'$NETWORK_UPGRADE_PATH'"}]}'
+curl -X POST -k http://localhost:8081/v1/control/start -d '{"execPath":"'${CAMINO_NODE_EXEC_PATH}'","numNodes":5,"logLevel":"INFO","pluginDir":"'${AVALANCHEGO_PLUGIN_PATH}'","blockchainSpecs":[{"vm_name":"blobvm","genesis":"/tmp/blobvm.json","chain_config":"'$CHAIN_CONFIG_PATH'","network_upgrade":"'$NETWORK_UPGRADE_PATH'"}]}'
 
 # or
-avalanche-network-runner control start \
+camino-network-runner control start \
 --log-level debug \
 --endpoint="0.0.0.0:8080" \
---avalanchego-path ${AVALANCHEGO_EXEC_PATH} \
+--camino-node ${CAMINO_NODE_EXEC_PATH} \
 --plugin-dir ${AVALANCHEGO_PLUGIN_PATH} \
 --blockchain-specs '[{"vm_name": "blobvm", "genesis": "/tmp/blobvm.genesis.json", "chain_config": "'$CHAIN_CONFIG_PATH'", "network_upgrade": "'$NETWORK_UPGRADE_PATH'"}]'
 ```
@@ -691,7 +691,7 @@ avalanche-network-runner control start \
 To start the server:
 
 ```bash
-avalanche-network-runner server \
+camino-network-runner server \
 --log-level debug \
 --port=":8080" \
 --grpc-gateway-port=":8081"
@@ -739,16 +739,16 @@ echo hello > /tmp/timestampvm.genesis.json
 
 ```bash
 # replace execPath with the path to AvalancheGo on your machine
-AVALANCHEGO_EXEC_PATH="${HOME}/go/src/github.com/ava-labs/avalanchego/build/avalanchego"
+CAMINO_NODE_EXEC_PATH="${HOME}/go/src/github.com/ava-labs/avalanchego/build/avalanchego"
 AVALANCHEGO_PLUGIN_PATH="${HOME}/go/src/github.com/ava-labs/avalanchego/build/plugins"
 
-curl -X POST -k http://localhost:8081/v1/control/start -d '{"execPath":"'${AVALANCHEGO_EXEC_PATH}'","numNodes":5,"logLevel":"INFO","pluginDir":"'${AVALANCHEGO_PLUGIN_PATH}'","blockchainSpecs":[{"vmName":"timestampvm","genesis":"/tmp/timestampvm.genesis.json"}]}'
+curl -X POST -k http://localhost:8081/v1/control/start -d '{"execPath":"'${CAMINO_NODE_EXEC_PATH}'","numNodes":5,"logLevel":"INFO","pluginDir":"'${AVALANCHEGO_PLUGIN_PATH}'","blockchainSpecs":[{"vmName":"timestampvm","genesis":"/tmp/timestampvm.genesis.json"}]}'
 
 # or
-avalanche-network-runner control start \
+camino-network-runner control start \
 --log-level debug \
 --endpoint="0.0.0.0:8080" \
---avalanchego-path ${AVALANCHEGO_EXEC_PATH} \
+--camino-node ${CAMINO_NODE_EXEC_PATH} \
 --plugin-dir ${AVALANCHEGO_PLUGIN_PATH} \
 --blockchain-specs '[{"vm_name":"timestampvm","genesis":"/tmp/timestampvm.genesis.json"}]'
 ```
