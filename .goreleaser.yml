@@ -5,19 +5,21 @@ builds:
     binary: camino-network-runner
     flags:
       - -v
+    ldflags:
+      - -X 'github.com/chain4travel/camino-network-runner/cmd.Version={{.Version}}'
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
     env:
       - CGO_ENABLED=1
       - CGO_CFLAGS=-O -D__BLST_PORTABLE__ # Set the CGO flags to use the portable version of BLST
-    ignore:
-      - goos: darwin
-        goarch: 386
+    overrides:
       - goos: linux
-        goarch: 386
-      - goos: windows
-        goarch: 386
-      - goos: freebsd
-        goarch: 386
-
+        goarch: arm64
+        env:
+          - CC=aarch64-linux-gnu-gcc
 release:
   # Repo in which the release will be created.
   # Default is extracted from the origin remote URL or empty if its private hosted.
