@@ -3,10 +3,10 @@ name: Build + test + release
 on:
   push:
     branches:
-      - main
-    tags:
-      - "*"
+      - chain4travel
   pull_request:
+  release:
+    types: [created]
 
 permissions:
   contents: write
