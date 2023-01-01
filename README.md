@@ -14,53 +14,7 @@ This tool may be especially useful for development and testing.
 To download a binary for the latest release, run:
 
 ```sh
-curl -sSfL https://raw.githubusercontent.com/ava-labs/camino-network-runner/main/scripts/install.sh | sh -s
-```
-
-The binary will be installed inside the `~/bin` directory.
-
-To add the binary to your path, run
-
-```sh
-export PATH=~/bin:$PATH
-```
-
-To add it to your path permanently, add an export command to your shell initialization script (ex: .bashrc).
-
-## Build from source code
-
-To download the binary into a specific directory, run:
-
-```sh
-curl -sSfL https://raw.githubusercontent.com/ava-labs/camino-network-runner/main/scripts/install.sh | sh -s -- -b <relative directory>
-```
-
-### Install using golang
-
-Requires golang to be installed on the system ([https://go.dev/doc/install](https://go.dev/doc/install)).
-
-### Download
-
-```sh
-go install github.com/chain4travel/camino-network-runner@latest
-```
-
-After that, the `camino-network-runner` binary should be present under the `$HOME/go/bin/` directory. Consider adding this directory to the `PATH` environment variable.
-
-### Install by release download
-
-Does not require golang to be installed on the system.
-
-Download the desired distribution from [https://github.com/chain4travel/camino-network-runner/releases](https://github.com/chain4travel/camino-network-runner/releases).
-
-Uncompress and locate where is convenient. Consider adding the target bin directory to the `PATH` environment variable.
-
-### Install from source code and execute tests
-
-#### Download
-
-```sh
-git clone https://github.com/chain4travel/camino-network-runner.git
+curl -sSfL https://raw.githubusercontent.com/chain4travel/camino-network-runner/chain4travel/scripts/install.sh | sh -s
 ```
 
 The binary will be installed inside the `./bin` directory.
@@ -71,7 +25,39 @@ To add the binary to your path, run
 export PATH=$PWD/bin:$PATH
 ```
 
-After that, `camino-network-runner` binary should be present under `$HOME/go/bin/` directory. Consider adding this directory to the `PATH` environment variable.
+To add it to your path permanently, add an export command to your shell initialization script (ex: .bashrc).
+
+#### Installing to a custom location
+
+To download the binary into a specific directory, run:
+
+```sh
+curl -sSfL https://raw.githubusercontent.com/chain4travel/camino-network-runner/chain4travel/scripts/install.sh | sh -s -- -b <directory>
+```
+
+### Build from source code
+
+#### Download
+
+```sh
+git clone https://github.com/chain4travel/camino-network-runner.git
+```
+
+#### Build
+
+From inside the cloned directory:
+
+```sh
+./scripts/build.sh
+```
+
+The binary will be installed inside the `./bin` directory.
+
+To add the binary to your path, run:
+
+```sh
+export PATH=$PWD/bin:$PATH
+```
 
 #### Run Unit Tests
 

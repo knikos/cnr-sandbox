@@ -2,12 +2,12 @@
 set -e
 
 PROJECT_NAME=camino-network-runner
-OWNER=ava-labs
+OWNER=chain4travel
 REPO="camino-network-runner"
 BINARY=camino-network-runner
 FORMAT=tar.gz
 PREFIX="$OWNER/$REPO"
-DEFAULT_INSTALL=~/bin
+DEFAULT_INSTALL=./bin
 
 usage() {
   this=$1
@@ -26,8 +26,8 @@ EOF
 }
 
 parse_args() {
-  #BINDIR is ./bin unless set be ENV
-  # over-ridden by flag below
+  # BINDIR is ./bin (set by DEFAULT_INSTALL above)
+  # unless over-ridden by ENV
 
   BINDIR=${BINDIR:-$DEFAULT_INSTALL}
   while getopts "b:dh?x" arg; do
