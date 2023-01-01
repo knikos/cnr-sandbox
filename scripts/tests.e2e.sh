@@ -3,14 +3,14 @@ set -e
 
 export RUN_E2E="true"
 # e.g.,
-# ./scripts/tests.e2e.sh 0.3.0-alpha1 0.3.0-alpha2
+# ./scripts/tests.e2e.sh 0.4.1-rc1 0.4.1-rc1
 if ! [[ "$0" =~ scripts/tests.e2e.sh ]]; then
   echo "must be run from repository root"
   exit 255
 fi
 
-DEFAULT_VERSION_1=0.3.0-alpha1
-DEFAULT_VERSION_2=0.3.0-alpha2
+DEFAULT_VERSION_1=0.4.1-rc1
+DEFAULT_VERSION_2=0.4.1-rc2
 
 if [ $# == 0 ]; then
     VERSION_1=$DEFAULT_VERSION_1

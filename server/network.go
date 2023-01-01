@@ -74,6 +74,8 @@ type localNetworkOptions struct {
 	chainConfigs map[string]string
 	// upgrade configs to be added to the network, besides the ones in default config, or saved snapshot
 	upgradeConfigs map[string]string
+	// subnet configs to be added to the network, besides the ones in default config, or saved snapshot
+	subnetConfigs map[string]string
 
 	// to block racey restart while installing custom chains
 	restartMu *sync.RWMutex
@@ -89,7 +91,8 @@ type localNetworkOptions struct {
 
 func newLocalNetwork(opts localNetworkOptions) (*localNetwork, error) {
 	lcfg := logging.Config{
-		LogLevel: opts.logLevel,
+		LogLevel:     opts.logLevel,
+		DisplayLevel: opts.logLevel,
 	}
 	lcfg.Directory = opts.rootDataDir
 	logFactory := logging.NewFactory(lcfg)
@@ -152,6 +155,9 @@ func (lc *localNetwork) createConfig() error {
 		}
 		for k, v := range lc.options.upgradeConfigs {
 			cfg.NodeConfigs[i].UpgradeConfigFiles[k] = v
+		}
+		for k, v := range lc.options.subnetConfigs {
+			cfg.NodeConfigs[i].SubnetConfigFiles[k] = v
 		}
 
 		if cfg.NodeConfigs[i].Flags == nil {
@@ -350,7 +356,7 @@ func (lc *localNetwork) createSubnets(
 }
 
 func (lc *localNetwork) loadSnapshot(
-	ctx context.Context,
+	_ context.Context,
 	snapshotName string,
 ) error {
 	ux.Print(lc.log, logging.Blue.Wrap(logging.Bold.Wrap("create and run local network from snapshot")))
@@ -376,6 +382,7 @@ func (lc *localNetwork) loadSnapshot(
 		buildDir,
 		lc.options.chainConfigs,
 		lc.options.upgradeConfigs,
+		lc.options.subnetConfigs,
 		globalNodeConfig,
 		lc.options.reassignPortsIfUsed,
 	)

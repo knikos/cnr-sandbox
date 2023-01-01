@@ -72,19 +72,22 @@ type Config struct {
 	ChainConfigFiles map[string]string `json:"chainConfigFiles"`
 	// Upgrade config files to use per default, if not specified in node config
 	UpgradeConfigFiles map[string]string `json:"upgradeConfigFiles"`
+	// Subnet config files to use per default, if not specified in node config
+	SubnetConfigFiles map[string]string `json:"subnetConfigFiles"`
 }
 
 // Validate returns an error if this config is invalid
 func (c *Config) Validate() error {
-	var someNodeIsBeacon bool
-	switch {
-	case len(c.Genesis) == 0:
+	if len(c.Genesis) == 0 {
 		return errors.New("no genesis given")
 	}
+
 	networkID, err := utils.NetworkIDFromGenesis([]byte(c.Genesis))
 	if err != nil {
 		return fmt.Errorf("couldn't get network ID from genesis: %w", err)
 	}
+
+	var someNodeIsBeacon bool
 	for i, nodeConfig := range c.NodeConfigs {
 		if err := nodeConfig.Validate(networkID); err != nil {
 			var nodeName string

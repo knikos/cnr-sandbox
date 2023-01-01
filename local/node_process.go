@@ -61,7 +61,7 @@ func (npc *nodeProcessCreator) NewNodeProcess(config node.Config, args ...string
 	if config.RedirectStdout {
 		stdout, err := cmd.StdoutPipe()
 		if err != nil {
-			return nil, fmt.Errorf("couldn't create stdout pipe: %s", err)
+			return nil, fmt.Errorf("couldn't create stdout pipe: %w", err)
 		}
 		// redirect stdout and assign a color to the text
 		utils.ColorAndPrepend(stdout, npc.stdout, config.Name, color)
@@ -69,7 +69,7 @@ func (npc *nodeProcessCreator) NewNodeProcess(config node.Config, args ...string
 	if config.RedirectStderr {
 		stderr, err := cmd.StderrPipe()
 		if err != nil {
-			return nil, fmt.Errorf("couldn't create stderr pipe: %s", err)
+			return nil, fmt.Errorf("couldn't create stderr pipe: %w", err)
 		}
 		// redirect stderr and assign a color to the text
 		utils.ColorAndPrepend(stderr, npc.stderr, config.Name, color)
