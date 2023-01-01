@@ -6,30 +6,21 @@ builds:
     flags:
       - -v
     ldflags:
-      - -X 'github.com/chain4travel/camino-network-runner/cmd.Version={{.Version}}'
-    goos:
-      - linux
-      - darwin
-    goarch:
-      - amd64
-      - arm64
-    env:
-      - CGO_ENABLED=1
-      - CGO_CFLAGS=-O -D__BLST_PORTABLE__ # Set the CGO flags to use the portable version of BLST
+      - -X 'github.com/ava-labs/avalanche-network-runner/cmd.Version={{.Version}}'
+    targets:
+      - linux_amd64_v1
+      - darwin_amd64_v1
+      - darwin_arm64
     overrides:
-      - goos: linux
-        goarch: arm64
-        env:
-          - CC=aarch64-linux-gnu-gcc
-      - goos: darwin
-        goarch: arm64
-        env:
-          - CC=oa64-clang
       - goos: darwin
         goarch: amd64
         goamd64: v1
         env:
           - CC=o64-clang
+      - goos: darwin
+        goarch: arm64
+        env:
+          - CC=oa64-clang
 release:
   # Repo in which the release will be created.
   # Default is extracted from the origin remote URL or empty if its private hosted.
