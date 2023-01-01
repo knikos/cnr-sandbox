@@ -11,30 +11,23 @@ This tool may be especially useful for development and testing.
 
 ## Installation
 
-### Using install script
-
-This is the preferred way. Does not require golang to be installed on the system.
-
 To download a binary for the latest release, run:
 
 ```sh
 curl -sSfL https://raw.githubusercontent.com/ava-labs/camino-network-runner/main/scripts/install.sh | sh -s
 ```
 
-The binary will be installed inside the `./bin` directory (relative to where the install command was run).
-
-_Downloading binaries from the Github UI will cause permission errors on Mac._
+The binary will be installed inside the `~/bin` directory.
 
 To add the binary to your path, run
 
 ```sh
-cd bin
-export PATH=$PWD:$PATH
+export PATH=~/bin:$PATH
 ```
 
 To add it to your path permanently, add an export command to your shell initialization script (ex: .bashrc).
 
-#### Installing in Custom Location
+## Build from source code
 
 To download the binary into a specific directory, run:
 
@@ -45,6 +38,8 @@ curl -sSfL https://raw.githubusercontent.com/ava-labs/camino-network-runner/main
 ### Install using golang
 
 Requires golang to be installed on the system ([https://go.dev/doc/install](https://go.dev/doc/install)).
+
+### Download
 
 ```sh
 go install github.com/chain4travel/camino-network-runner@latest
@@ -68,12 +63,12 @@ Uncompress and locate where is convenient. Consider adding the target bin direct
 git clone https://github.com/chain4travel/camino-network-runner.git
 ```
 
-#### Install
+The binary will be installed inside the `./bin` directory.
 
-From inside the cloned directory:
+To add the binary to your path, run
 
 ```sh
-go install
+export PATH=$PWD/bin:$PATH
 ```
 
 After that, `camino-network-runner` binary should be present under `$HOME/go/bin/` directory. Consider adding this directory to the `PATH` environment variable.
@@ -86,7 +81,7 @@ Inside the directory cloned above:
 go test ./...
 ```
 
-#### Run E2E tests
+### Run E2E tests
 
 The E2E test checks `camino-network-runner` RPC communication and control. It starts a network against a fresh RPC
 server and executes a set of query and control operations on it.
@@ -101,7 +96,7 @@ The E2E test checks whether a node can be restarted with a different binary vers
 different versions as arguments. For Example:
 
 ```sh
-./scripts/tests.e2e.sh 1.7.9 1.7.10
+./scripts/tests.e2e.sh v0.4.1-rc1 v0.4.1-rc1
 ```
 
 ##### `RUN_E2E` environment variable
@@ -356,13 +351,34 @@ curl -X POST -k http://localhost:8081/v1/control/createblockchains -d '{"pluginD
 camino-network-runner control create-blockchains '[{"vm_name":"'$VM_NAME'","genesis":"'$GENESIS_PATH'", "subnet_id": "'$SUBNET_ID'"}]' --plugin-dir $PLUGIN_DIR
 ```
 
-To create a blockchain with a subnet id, and both chain config and network upgrade file paths (requires network restart):
+To create a blockchain with a subnet id, and chain config, network upgrade and subnet config file paths (requires network restart):
 
 ```bash
-curl -X POST -k http://localhost:8081/v1/control/createblockchains -d '{"pluginDir":"'$PLUGIN_DIR'","blockchainSpecs":[{"vm_name":"'$VM_NAME'","genesis":"'$GENESIS_PATH'", "subnet_id": "'$SUBNET_ID'", "chain_config": "'$CHAIN_CONFIG_PATH'", "network_upgrade": "'$NETWORK_UPGRADE_PATH'"}]}'
+curl -X POST -k http://localhost:8081/v1/control/createblockchains -d '{"pluginDir":"'$PLUGIN_DIR'","blockchainSpecs":[{"vm_name":"'$VM_NAME'","genesis":"'$GENESIS_PATH'", "subnet_id": "'$SUBNET_ID'", "chain_config": "'$CHAIN_CONFIG_PATH'", "network_upgrade": "'$NETWORK_UPGRADE_PATH'", "subnet_config": "'$SUBNET_CONFIG_PATH'"}]}'
 
 # or
-camino-network-runner control create-blockchains '[{"vm_name":"'$VM_NAME'","genesis":"'$GENESIS_PATH'", "subnet_id": "'$SUBNET_ID'", "chain_config": "'$CHAIN_CONFIG_PATH'", "network_upgrade": "'$NETWORK_UPGRADE_PATH'"}]' --plugin-dir $PLUGIN_DIR
+camino-network-runner control create-blockchains '[{"vm_name":"'$VM_NAME'","genesis":"'$GENESIS_PATH'", "subnet_id": "'$SUBNET_ID'", "chain_config": "'$CHAIN_CONFIG_PATH'", "network_upgrade": "'$NETWORK_UPGRADE_PATH'", "subnet_config": "'$SUBNET_CONFIG_PATH'"}]' --plugin-dir $PLUGIN_DIR
+```
+
+Chain config can also be defined on a per node basis. For that, a per node chain config file is needed, which is a JSON that specifies the chain config per node. For example, given the following as the contents of the file with path `$PER_NODE_CHAIN_CONFIG`:
+
+```json
+{
+    "node1": {"rpc-tx-fee-cap": 101},
+    "node2": {"rpc-tx-fee-cap": 102},
+    "node3": {"rpc-tx-fee-cap": 103},
+    "node4": {"rpc-tx-fee-cap": 104},
+    "node5": {"rpc-tx-fee-cap": 105}
+}
+```
+
+Then a blockchain with different chain configs per node can be created with this command:
+
+```bash
+curl -X POST -k http://localhost:8081/v1/control/createblockchains -d '{"pluginDir":"'$PLUGIN_DIR'","blockchainSpecs":[{"vm_name":"'$VM_NAME'","genesis":"'$GENESIS_PATH'", "subnet_id": "'$SUBNET_ID'", "per_node_chain_config": "'$PER_NODE_CHAIN_CONFIG'", "network_upgrade": "'$NETWORK_UPGRADE_PATH'", "subnet_config": "'$SUBNET_CONFIG_PATH'"}]}'
+
+# or
+camino-network-runner control create-blockchains '[{"vm_name":"'$VM_NAME'","genesis":"'$GENESIS_PATH'", "subnet_id": "'$SUBNET_ID'", "per_node_chain_config": "'$PER_NODE_CHAIN_CONFIG'", "network_upgrade": "'$NETWORK_UPGRADE_PATH'", "subnet_config": "'$SUBNET_CONFIG_PATH'"}]' --plugin-dir $PLUGIN_DIR
 ```
 
 To remove (stop) a node:
@@ -586,10 +602,10 @@ camino-network-runner control start \
 curl -X POST -k http://localhost:8081/v1/control/status -d ''
 ```
 
-Blockchain config file and network upgrade file paths can be optionally specified at network start, eg:
+Blockchain config file, network upgrade file, and subnet config file paths can be optionally specified at network start, eg:
 
 ```bash
-curl -X POST -k http://localhost:8081/v1/control/start -d '{"execPath":"'${CAMINO_NODE_EXEC_PATH}'","numNodes":5,"logLevel":"INFO","pluginDir":"'${AVALANCHEGO_PLUGIN_PATH}'","blockchainSpecs":[{"vm_name":"subnetevm","genesis":"/tmp/subnet-evm.genesis.json","chain_config":"'$CHAIN_CONFIG_PATH'","network_upgrade":"'$NETWORK_UPGRADE_PATH'"}]}'
+curl -X POST -k http://localhost:8081/v1/control/start -d '{"execPath":"'${CAMINO_NODE_EXEC_PATH}'","numNodes":5,"logLevel":"INFO","pluginDir":"'${AVALANCHEGO_PLUGIN_PATH}'","blockchainSpecs":[{"vm_name":"subnetevm","genesis":"/tmp/subnet-evm.genesis.json","chain_config":"'$CHAIN_CONFIG_PATH'","network_upgrade":"'$NETWORK_UPGRADE_PATH'","subnet_config":"'$SUBNET_CONFIG_PATH'"}]}'
 
 # or
 camino-network-runner control start \
@@ -597,7 +613,7 @@ camino-network-runner control start \
 --endpoint="0.0.0.0:8080" \
 --camino-node ${CAMINO_NODE_EXEC_PATH} \
 --plugin-dir ${AVALANCHEGO_PLUGIN_PATH} \
---blockchain-specs '[{"vm_name": "subnetevm", "genesis": "/tmp/subnet-evm.genesis.json", "chain_config": "'$CHAIN_CONFIG_PATH'", "network_upgrade": "'$NETWORK_UPGRADE_PATH'"}]'
+--blockchain-specs '[{"vm_name": "subnetevm", "genesis": "/tmp/subnet-evm.genesis.json", "chain_config": "'$CHAIN_CONFIG_PATH'", "network_upgrade": "'$NETWORK_UPGRADE_PATH'", "subnet_config": "'$SUBNET_CONFIG_PATH'"}]'
 ```
 
 ## `network-runner` RPC server: `blobvm` example
@@ -675,7 +691,7 @@ curl -X POST -k http://localhost:8081/v1/control/status -d ''
 Blockchain config file and network upgrade file paths can be optionally specified at network start, eg:
 
 ```bash
-curl -X POST -k http://localhost:8081/v1/control/start -d '{"execPath":"'${CAMINO_NODE_EXEC_PATH}'","numNodes":5,"logLevel":"INFO","pluginDir":"'${AVALANCHEGO_PLUGIN_PATH}'","blockchainSpecs":[{"vm_name":"blobvm","genesis":"/tmp/blobvm.json","chain_config":"'$CHAIN_CONFIG_PATH'","network_upgrade":"'$NETWORK_UPGRADE_PATH'"}]}'
+curl -X POST -k http://localhost:8081/v1/control/start -d '{"execPath":"'${CAMINO_NODE_EXEC_PATH}'","numNodes":5,"logLevel":"INFO","pluginDir":"'${AVALANCHEGO_PLUGIN_PATH}'","blockchainSpecs":[{"vm_name":"blobvm","genesis":"/tmp/blobvm.json","chain_config":"'$CHAIN_CONFIG_PATH'","network_upgrade":"'$NETWORK_UPGRADE_PATH'","subnet_config":"'$SUBNET_CONFIG_PATH'"}]}'
 
 # or
 camino-network-runner control start \
@@ -683,7 +699,7 @@ camino-network-runner control start \
 --endpoint="0.0.0.0:8080" \
 --camino-node ${CAMINO_NODE_EXEC_PATH} \
 --plugin-dir ${AVALANCHEGO_PLUGIN_PATH} \
---blockchain-specs '[{"vm_name": "blobvm", "genesis": "/tmp/blobvm.genesis.json", "chain_config": "'$CHAIN_CONFIG_PATH'", "network_upgrade": "'$NETWORK_UPGRADE_PATH'"}]'
+--blockchain-specs '[{"vm_name": "blobvm", "genesis": "/tmp/blobvm.genesis.json", "chain_config": "'$CHAIN_CONFIG_PATH'", "network_upgrade": "'$NETWORK_UPGRADE_PATH'", "subnet_config": "'$SUBNET_CONFIG_PATH'"}]'
 ```
 
 ## `network-runner` RPC server: `timestampvm` example
@@ -742,7 +758,7 @@ echo hello > /tmp/timestampvm.genesis.json
 CAMINO_NODE_EXEC_PATH="${HOME}/go/src/github.com/ava-labs/avalanchego/build/avalanchego"
 AVALANCHEGO_PLUGIN_PATH="${HOME}/go/src/github.com/ava-labs/avalanchego/build/plugins"
 
-curl -X POST -k http://localhost:8081/v1/control/start -d '{"execPath":"'${CAMINO_NODE_EXEC_PATH}'","numNodes":5,"logLevel":"INFO","pluginDir":"'${AVALANCHEGO_PLUGIN_PATH}'","blockchainSpecs":[{"vmName":"timestampvm","genesis":"/tmp/timestampvm.genesis.json"}]}'
+curl -X POST -k http://localhost:8081/v1/control/start -d '{"execPath":"'${CAMINO_NODE_EXEC_PATH}'","numNodes":5,"logLevel":"INFO","pluginDir":"'${AVALANCHEGO_PLUGIN_PATH}'","blockchainSpecs":[{"vmName":"timestampvm","genesis":"/tmp/timestampvm.genesis.json","blockchain_alias":"timestamp"}]}'
 
 # or
 camino-network-runner control start \
@@ -750,7 +766,7 @@ camino-network-runner control start \
 --endpoint="0.0.0.0:8080" \
 --camino-node ${CAMINO_NODE_EXEC_PATH} \
 --plugin-dir ${AVALANCHEGO_PLUGIN_PATH} \
---blockchain-specs '[{"vm_name":"timestampvm","genesis":"/tmp/timestampvm.genesis.json"}]'
+--blockchain-specs '[{"vm_name":"timestampvm","genesis":"/tmp/timestampvm.genesis.json","blockchain_alias":"timestamp"}]'
 ```
 
 ```bash
@@ -775,6 +791,8 @@ curl -X POST --data '{
 
 # in this example,
 # "E8isHenre76NMxbJ3munSQatV8GoQ4XKWQg9vD34xMBqEFJGf" is the blockchain Id
+# "timestamp" is the blockchain alias
+# You can use 127.0.0.1:9650/ext/bc/timestamp or 127.0.0.1:9650/ext/bc/E8isHenre76NMxbJ3munSQatV8GoQ4XKWQg9vD34xMBqEFJGf
 curl -X POST --data '{
     "jsonrpc": "2.0",
     "method": "timestampvm.proposeBlock",
@@ -782,7 +800,7 @@ curl -X POST --data '{
         "data":"0x6d796e6577626c6f636b0000000000000000000000000000000000000000000014228326"
     },
     "id": 1
-}' -H 'content-type:application/json;' 127.0.0.1:9650/ext/bc/E8isHenre76NMxbJ3munSQatV8GoQ4XKWQg9vD34xMBqEFJGf
+}' -H 'content-type:application/json;' 127.0.0.1:9650/ext/bc/timestamp
 ```
 
 ```bash
@@ -791,7 +809,7 @@ curl -X POST --data '{
     "method": "timestampvm.getBlock",
     "params":{},
     "id": 1
-}' -H 'content-type:application/json;' 127.0.0.1:9650/ext/bc/E8isHenre76NMxbJ3munSQatV8GoQ4XKWQg9vD34xMBqEFJGf
+}' -H 'content-type:application/json;' 127.0.0.1:9650/ext/bc/timestamp
 ```
 
 ## Configuration
@@ -813,10 +831,16 @@ type Config struct {
   StakingKey string `json:"stakingKey"`
   // Must not be nil.
   StakingCert string `json:"stakingCert"`
+  // Must not be nil.
+  StakingSigningKey string `json:"stakingSigningKey"`
   // May be nil.
   ConfigFile string `json:"configFile"`
   // May be nil.
   ChainConfigFiles map[string]string `json:"chainConfigFiles"`
+  // May be nil.
+  UpgradeConfigFiles map[string]string `json:"upgradeConfigFiles"`
+  // May be nil.
+  SubnetConfigFiles map[string]string `json:"subnetConfigFiles"`
   // Flags can hold additional flags for the node.
   // It can be empty.
   // The precedence of flags handling is:

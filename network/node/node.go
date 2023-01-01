@@ -68,12 +68,16 @@ type Config struct {
 	StakingKey string `json:"stakingKey"`
 	// Must not be nil.
 	StakingCert string `json:"stakingCert"`
+	// Must not be nil.
+	StakingSigningKey string `json:"stakingSigningKey"`
 	// May be nil.
 	ConfigFile string `json:"configFile"`
 	// May be nil.
 	ChainConfigFiles map[string]string `json:"chainConfigFiles"`
 	// May be nil.
 	UpgradeConfigFiles map[string]string `json:"upgradeConfigFiles"`
+	// May be nil.
+	SubnetConfigFiles map[string]string `json:"subnetConfigFiles"`
 	// Flags can hold additional flags for the node.
 	// It can be empty.
 	// The precedence of flags handling is:
