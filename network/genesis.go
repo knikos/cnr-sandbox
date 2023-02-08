@@ -4,10 +4,15 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
+	"math/big"
+	"os"
 
 	coreth_params "github.com/ava-labs/coreth/params"
 )
 
+// PrivateKey-12bQFG6mSUVLsq2H1EAxGbu8p6mYi7zEA7QvQzJezL12JS8j5 -> X-kopernikus1zy075lddftstzpwzvt627mvc0tep0vyk7y9v4l
+// PrivateKey-BhnbhFKyDjhW8r3v9ZY6wPWkrAphTVPzniLjLrviZV8ndHMBe -> X-kopernikus1lx58kettrnt2kyr38adyrrmxt5x57u4vg4cfky
+// PrivateKey-Ge71NJhUY3TjZ9dLohijSnNq46QxobjqxHGMUDAPoVsNFA93w -> X-kopernikus13kyf72ftu4l77kss7xm0kshm0au29s48zjaygq
 //go:embed default/genesis.json
 var genesisBytes []byte
 
@@ -26,6 +31,10 @@ func LoadLocalGenesis() (map[string]interface{}, error) {
 	// set the cchain genesis directly from coreth
 	// the whole of `cChainGenesis` should be set as a string, not a json object...
 	corethCChainGenesis := coreth_params.AvalancheLocalChainConfig
+	if _, ok := os.LookupEnv("CAMINO_NETWORK"); ok {
+		corethCChainGenesis.SunrisePhase0BlockTimestamp = big.NewInt(0)
+	}
+
 	// but the part in coreth is only the "config" part.
 	// In order to set it easily, first we get the cChainGenesis item
 	// convert it to a map
