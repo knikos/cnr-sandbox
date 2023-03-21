@@ -26,6 +26,12 @@ const (
 )
 
 // node6: PrivateKey-UfV3iPVP8ThZuSXmUacsahdzePs5VkXct4XoQKsW9mffN1d8J -> X-kopernikus1nnptptd6l2a4ty69jgv9ng70va72lyx2xq7ddx
+// Admin: PrivateKey-vmRQiZeXEXYMyJhEiqdC2z5JhuDbxL8ix9UVvjgMu2Er1NepE => X-kopernikus1g65uqn6t77p656w64023nh8nd9updzmxh8ttv3
+// Admin C-chain: 0x1f0e5c64afdf53175f78846f7125776e76fa8f34
+// KYC: PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN => X-kopernikus18jma8ppw3nhx5r4ap8clazz0dps7rv5uuvjh68
+// KYC C-chain: 0x8db97c7cece249c2b98bdc0226cc4c2a57bf52fc
+// Gas Fee: PrivateKey-Ge71NJhUY3TjZ9dLohijSnNq46QxobjqxHGMUDAPoVsNFA93w -> X-kopernikus13kyf72ftu4l77kss7xm0kshm0au29s48zjaygq
+// Gas Fee C-chain: 0x305cea207112c0561033133f816d7a2233699f06
 var (
 	//go:embed node6
 	node6DirPath   embed.FS
@@ -176,7 +182,6 @@ func run(log logging.Logger, binaryPath string) error {
 }
 
 func postProcessConfig(config *network.Config) {
-
 	var genesisMap map[string]interface{}
 	json.Unmarshal([]byte(config.Genesis), &genesisMap)
 
@@ -202,6 +207,22 @@ func postProcessConfig(config *network.Config) {
 	})
 	camino["depositOffers"] = depositOffers
 
+	var cChainGenesis map[string]interface{}
+	cChainGenesisString, ok := genesisMap["cChainGenesis"].(string)
+	if !ok {
+		panic(errors.New("could not get cChainGenesis in genesis"))
+	}
+
+	err := json.Unmarshal([]byte(cChainGenesisString), &cChainGenesis)
+	if err != nil {
+		panic(err)
+	}
+
+	alloc, ok := cChainGenesis["alloc"].(map[string]interface{})
+	if !ok {
+		panic(errors.New("could not get alloc in genesis"))
+	}
+
 	allocations, ok := camino["allocations"].([]interface{})
 	if !ok {
 		panic(errors.New("could not get allocations in genesis"))
@@ -209,14 +230,15 @@ func postProcessConfig(config *network.Config) {
 
 	// add funds to admin address
 	for _, allocation := range allocations {
-
 		allocationMap, ok := allocation.(map[string]interface{})
 		if !ok {
 			panic(errors.New("could not get allocation in genesis"))
 		}
+
 		if allocationMap["avaxAddr"] != "X-kopernikus1g65uqn6t77p656w64023nh8nd9updzmxh8ttv3" {
 			continue
 		}
+
 		platformAllocations, ok := allocationMap["platformAllocations"].([]interface{})
 		if !ok {
 			panic(errors.New("could not get platformAllocations in genesis"))
@@ -235,7 +257,25 @@ func postProcessConfig(config *network.Config) {
 		},
 		"platformAllocations": []interface{}{map[string]interface{}{"amount": 4000000000000}},
 	})
+
 	camino["allocations"] = allocations
+
+	cChainGenesis["initialAdmin"] = "0x1f0e5c64afdf53175f78846f7125776e76fa8f34"
+
+	alloc["1f0e5c64afdf53175f78846f7125776e76fa8f34"] = map[string]interface{}{ // adminAddress
+		"balance": "0x295BE96E64066972000000",
+	}
+	alloc["305cea207112c0561033133f816d7a2233699f06"] = map[string]interface{}{ // gasFeeAddress
+		"balance": "0x295BE96E64066972000000",
+	}
+	cChainGenesis["alloc"] = alloc
+
+	cChainGenesisBytes, err := json.Marshal(cChainGenesis)
+	if err != nil {
+		panic(err)
+	}
+
+	genesisMap["cChainGenesis"] = string(cChainGenesisBytes)
 
 	// now we can marshal the *whole* thing into bytes
 	updatedGenesis, err := json.Marshal(genesisMap)
