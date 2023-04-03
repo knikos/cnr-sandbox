@@ -26,15 +26,20 @@ const (
 )
 
 // node6: PrivateKey-UfV3iPVP8ThZuSXmUacsahdzePs5VkXct4XoQKsW9mffN1d8J -> X-kopernikus1nnptptd6l2a4ty69jgv9ng70va72lyx2xq7ddx
+// node7: PrivateKey-2DXzE36hZ3MSKxk1Un5mBHGwcV69CqkKvbVvSwFBhDRtnbFCDX -> X-kopernikus1v3ujye6nv5ufd23s6a3cl9323n7mkt3hmw46gz
 // Admin: PrivateKey-vmRQiZeXEXYMyJhEiqdC2z5JhuDbxL8ix9UVvjgMu2Er1NepE => X-kopernikus1g65uqn6t77p656w64023nh8nd9updzmxh8ttv3
 // Admin C-chain: 0x1f0e5c64afdf53175f78846f7125776e76fa8f34
 // KYC: PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN => X-kopernikus18jma8ppw3nhx5r4ap8clazz0dps7rv5uuvjh68
 // KYC C-chain: 0x8db97c7cece249c2b98bdc0226cc4c2a57bf52fc
 // Gas Fee: PrivateKey-Ge71NJhUY3TjZ9dLohijSnNq46QxobjqxHGMUDAPoVsNFA93w -> X-kopernikus13kyf72ftu4l77kss7xm0kshm0au29s48zjaygq
 // Gas Fee C-chain: 0x305cea207112c0561033133f816d7a2233699f06
+// MultiSig Owner 1: PrivateKey-2Vtf2ZhTRz6WcVcSH7cS7ghKneZxZ2L5W8assdCcaNDVdpoYfY -> X-kopernikus1jla8ty5c9ud6lsj8s4re2dvzvfxpzrxdcrd8q7
+// MultiSig Owner 2: PrivateKey-XQFgPzByKfqFfpVTafmZHBqfaw4hsDTGbbcArUg4unMiEKvrD -> X-kopernikus15hscuhlg5tkv4wwrujqgarne3tau83wrpp2d0d
 var (
 	//go:embed node6
+	//go:embed node7
 	node6DirPath   embed.FS
+	node7DirPath   embed.FS
 	caminoNodePath = os.ExpandEnv("$CAMINO_NODE_PATH")
 )
 
@@ -160,6 +165,54 @@ func run(log logging.Logger, binaryPath string) error {
 		return err
 	}
 
+	node7Dir, err := fs.Sub(node6DirPath, "node7")
+	if err != nil {
+		panic(err)
+	}
+	flagsBytes, err = fs.ReadFile(node7Dir, "flags.json")
+	if err != nil {
+		panic(err)
+	}
+	flags = map[string]interface{}{}
+	if err = json.Unmarshal(flagsBytes, &flags); err != nil {
+		panic(err)
+	}
+
+	// Add 7th node
+	stakingKeyN7, err := fs.ReadFile(node7Dir, "staker.key")
+	if err != nil {
+		panic(err)
+	}
+	stakingCertN7, err := fs.ReadFile(node7Dir, "staker.crt")
+	if err != nil {
+		panic(err)
+	}
+	stakingSigningKeyN7, err := fs.ReadFile(node7Dir, "signer.key")
+	if err != nil {
+		panic(err)
+	}
+	encodedStakingSigningKeyN7 := base64.StdEncoding.EncodeToString(stakingSigningKeyN7)
+
+	nodeConfig7 := node.Config{
+		Name:              "node7",
+		BinaryPath:        binaryPath,
+		StakingKey:        string(stakingKeyN7),
+		StakingCert:       string(stakingCertN7),
+		StakingSigningKey: encodedStakingSigningKeyN7,
+		IsBeacon:          true,
+		// The flags below would override the config in this node's config file,
+		// if it had one.
+		Flags: map[string]interface{}{
+			config.LogLevelKey:    logging.Debug,
+			config.HTTPHostKey:    "0.0.0.0",
+			config.HTTPPortKey:    flags["http-port"],
+			config.StakingPortKey: flags["staking-port"],
+		},
+	}
+	if _, err := nw.AddNode(nodeConfig7); err != nil {
+		return err
+	}
+
 	// Wait until the nodes in the network are ready
 	ctx, cancel := context.WithTimeout(context.Background(), healthyTimeout)
 	defer cancel()
@@ -237,6 +290,23 @@ func postProcessConfig(config *network.Config) {
 		panic(errors.New("could not get alloc in genesis"))
 	}
 
+	initialMultisigAddresses := make([]interface{}, 0)
+
+	if caminoInitialMultisigAddresses, ok := camino["initialMultisigAddresses"].([]interface{}); ok {
+		initialMultisigAddresses = caminoInitialMultisigAddresses
+	}
+
+	initialMultisigAddresses = append(initialMultisigAddresses, map[string]interface{}{
+		"Alias":     "X-kopernikus1fwrv3kj5jqntuucw67lzgu9a9tkqyczxgcvpst", //alias
+		"Threshold": 1,
+		"Addresses": []string{
+			"X-kopernikus1jla8ty5c9ud6lsj8s4re2dvzvfxpzrxdcrd8q7",
+			"X-kopernikus15hscuhlg5tkv4wwrujqgarne3tau83wrpp2d0d",
+		},
+	})
+
+	camino["initialMultisigAddresses"] = initialMultisigAddresses
+
 	allocations, ok := camino["allocations"].([]interface{})
 	if !ok {
 		panic(errors.New("could not get allocations in genesis"))
@@ -244,15 +314,14 @@ func postProcessConfig(config *network.Config) {
 
 	// add funds to admin address
 	for _, allocation := range allocations {
+
 		allocationMap, ok := allocation.(map[string]interface{})
 		if !ok {
 			panic(errors.New("could not get allocation in genesis"))
 		}
-
 		if allocationMap["avaxAddr"] != "X-kopernikus1g65uqn6t77p656w64023nh8nd9updzmxh8ttv3" {
 			continue
 		}
-
 		platformAllocations, ok := allocationMap["platformAllocations"].([]interface{})
 		if !ok {
 			panic(errors.New("could not get platformAllocations in genesis"))
@@ -264,12 +333,38 @@ func postProcessConfig(config *network.Config) {
 	// add new address with p-funds
 	allocations = append(allocations, map[string]interface{}{
 		"ethAddr":  "0x0000000000000000000000000000000000000000",
+		"avaxAddr": "Χ-kopernikus1fwrv3kj5jqntuucw67lzgu9a9tkqyczxgcvpst",
+		"amount":   1000000000000,
+		"addressStates": map[string]interface{}{
+			"consortiumMember": true,
+			"kycVerified":      true,
+		},
+		"platformAllocations": []interface{}{map[string]interface{}{
+			"amount": 200000000000000000,
+		}},
+	})
+
+	allocations = append(allocations, map[string]interface{}{
+		"ethAddr":  "0x0000000000000000000000000000000000000000",
 		"avaxAddr": "X-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g",
 		"addressStates": map[string]interface{}{
 			"consortiumMember": true,
 			"kycVerified":      true,
 		},
 		"platformAllocations": []interface{}{map[string]interface{}{"amount": 4000000000000}},
+	})
+
+	allocations = append(allocations, map[string]interface{}{
+		"ethAddr":  "0x0000000000000000000000000000000000000000",
+		"avaxAddr": "Χ-kopernikus1jla8ty5c9ud6lsj8s4re2dvzvfxpzrxdcrd8q7",
+		"amount":   1000000000000,
+		"addressStates": map[string]interface{}{
+			"consortiumMember": true,
+			"kycVerified":      true,
+		},
+		"platformAllocations": []interface{}{map[string]interface{}{
+			"amount": 200000000000000000,
+		}},
 	})
 
 	camino["allocations"] = allocations
