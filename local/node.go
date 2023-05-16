@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
-	"path/filepath"
 	"time"
 
 	"github.com/ava-labs/avalanche-network-runner/api"
@@ -66,8 +65,8 @@ type localNode struct {
 	dbDir string
 	// The logs dir of the node
 	logsDir string
-	// The build dir of the node
-	buildDir string
+	// The plugin dir of the node
+	pluginDir string
 	// The node config
 	config node.Config
 	// The node httpHost
@@ -122,10 +121,6 @@ func (node *localNode) AttachPeer(ctx context.Context, router router.InboundHand
 	}
 	signerIP := ips.NewDynamicIPPort(net.IPv6zero, 0)
 	tls := tlsCert.PrivateKey.(crypto.Signer)
-	gossipTracker, err := peer.NewGossipTracker(prometheus.NewRegistry(), "anr")
-	if err != nil {
-		return nil, err
-	}
 	config := &peer.Config{
 		Metrics:              metrics,
 		MessageCreator:       mc,
@@ -141,7 +136,6 @@ func (node *localNode) AttachPeer(ctx context.Context, router router.InboundHand
 		PongTimeout:          constants.DefaultPingPongTimeout,
 		MaxClockDifference:   time.Minute,
 		ResourceTracker:      resourceTracker,
-		GossipTracker:        gossipTracker,
 		IPSigner:             peer.NewIPSigner(signerIP, tls),
 	}
 	_, conn, cert, err := clientUpgrader.Upgrade(conn)
@@ -229,11 +223,8 @@ func (node *localNode) GetBinaryPath() string {
 }
 
 // See node.Node
-func (node *localNode) GetBuildDir() string {
-	if node.buildDir == "" {
-		return filepath.Dir(node.GetBinaryPath())
-	}
-	return node.buildDir
+func (node *localNode) GetPluginDir() string {
+	return node.pluginDir
 }
 
 // See node.Node
