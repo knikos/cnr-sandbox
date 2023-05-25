@@ -32,7 +32,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const defaultHealthyTimeout = 5 * time.Second
+const (
+	defaultHealthyTimeout = 5 * time.Second
+	nodeVersion           = "avalanche/1.9.5 extra"
+)
 
 var (
 	_ NodeProcessCreator    = &localTestSuccessfulNodeProcessCreator{}
@@ -50,16 +53,28 @@ func (*localTestSuccessfulNodeProcessCreator) NewNodeProcess(config node.Config,
 	return newMockProcessSuccessful(config, flags...)
 }
 
+func (*localTestSuccessfulNodeProcessCreator) GetNodeVersion(_ node.Config) (string, error) {
+	return nodeVersion, nil
+}
+
 type localTestFailedStartProcessCreator struct{}
 
 func (*localTestFailedStartProcessCreator) NewNodeProcess(node.Config, ...string) (NodeProcess, error) {
 	return nil, errors.New("error on purpose for test")
 }
 
+func (*localTestFailedStartProcessCreator) GetNodeVersion(_ node.Config) (string, error) {
+	return nodeVersion, nil
+}
+
 type localTestProcessUndefNodeProcessCreator struct{}
 
 func (*localTestProcessUndefNodeProcessCreator) NewNodeProcess(config node.Config, flags ...string) (NodeProcess, error) {
 	return newMockProcessUndef(config, flags...)
+}
+
+func (*localTestProcessUndefNodeProcessCreator) GetNodeVersion(_ node.Config) (string, error) {
+	return nodeVersion, nil
 }
 
 type localTestFlagCheckProcessCreator struct {
@@ -70,6 +85,10 @@ type localTestFlagCheckProcessCreator struct {
 func (lt *localTestFlagCheckProcessCreator) NewNodeProcess(config node.Config, flags ...string) (NodeProcess, error) {
 	lt.require.EqualValues(lt.expectedFlags, config.Flags)
 	return newMockProcessSuccessful(config, flags...)
+}
+
+func (*localTestFlagCheckProcessCreator) GetNodeVersion(_ node.Config) (string, error) {
+	return nodeVersion, nil
 }
 
 // Returns an API client where:
@@ -174,6 +193,10 @@ func (lt *localTestOneNodeCreator) NewNodeProcess(config node.Config, flags ...s
 		lt.require.EqualValues(v, gotV)
 	}
 	return lt.successCreator.NewNodeProcess(config, flags...)
+}
+
+func (*localTestOneNodeCreator) GetNodeVersion(_ node.Config) (string, error) {
+	return nodeVersion, nil
 }
 
 // Start a network with one node.
@@ -1017,7 +1040,9 @@ func TestSetNodeName(t *testing.T) {
 
 	// Case: name already present
 	config.Name = "hi"
-	ln.nodes = map[string]*localNode{"hi": nil}
+	ln.nodes = map[string]*localNode{
+		"hi": {},
+	}
 	err = ln.setNodeName(config)
 	require.Error(err)
 }
@@ -1128,27 +1153,20 @@ func TestWriteFiles(t *testing.T) {
 		t.Fatal(err)
 	}
 	stakingKeyPath := filepath.Join(tmpDir, stakingKeyFileName)
-	stakingKeyFlag := fmt.Sprintf("--%s=%v", config.StakingTLSKeyPathKey, stakingKeyPath)
 	stakingCertPath := filepath.Join(tmpDir, stakingCertFileName)
-	stakingCertFlag := fmt.Sprintf("--%s=%v", config.StakingCertPathKey, stakingCertPath)
 	stakingSigningKeyPath := filepath.Join(tmpDir, stakingSigningKeyFileName)
-	stakingSigningKeyFlag := fmt.Sprintf("--%s=%v", config.StakingSignerKeyPathKey, stakingSigningKeyPath)
 	genesisPath := filepath.Join(tmpDir, genesisFileName)
-	genesisFlag := fmt.Sprintf("--%s=%v", config.GenesisConfigFileKey, genesisPath)
 	configFilePath := filepath.Join(tmpDir, configFileName)
-	configFileFlag := fmt.Sprintf("--%s=%v", config.ConfigFileKey, configFilePath)
 	chainConfigDir := filepath.Join(tmpDir, chainConfigSubDir)
 	subnetConfigDir := filepath.Join(tmpDir, subnetConfigSubDir)
 	cChainConfigPath := filepath.Join(tmpDir, chainConfigSubDir, "C", configFileName)
-	chainConfigDirFlag := fmt.Sprintf("--%s=%v", config.ChainConfigDirKey, chainConfigDir)
-	subnetConfigDirFlag := fmt.Sprintf("--%s=%v", config.SubnetConfigDirKey, subnetConfigDir)
 
 	type test struct {
 		name          string
 		shouldErr     bool
 		genesis       []byte
 		nodeConfig    node.Config
-		expectedFlags []string
+		expectedFlags map[string]string
 	}
 
 	tests := []test{
@@ -1160,13 +1178,13 @@ func TestWriteFiles(t *testing.T) {
 				StakingKey:  stakingKey,
 				StakingCert: stakingCert,
 			},
-			expectedFlags: []string{
-				stakingKeyFlag,
-				stakingCertFlag,
-				stakingSigningKeyFlag,
-				genesisFlag,
-				chainConfigDirFlag,
-				subnetConfigDirFlag,
+			expectedFlags: map[string]string{
+				config.StakingTLSKeyPathKey:    stakingKeyPath,
+				config.StakingCertPathKey:      stakingCertPath,
+				config.StakingSignerKeyPathKey: stakingSigningKeyPath,
+				config.GenesisConfigFileKey:    genesisPath,
+				config.ChainConfigDirKey:       chainConfigDir,
+				config.SubnetConfigDirKey:      subnetConfigDir,
 			},
 		},
 		{
@@ -1178,14 +1196,14 @@ func TestWriteFiles(t *testing.T) {
 				StakingCert: stakingCert,
 				ConfigFile:  configFile,
 			},
-			expectedFlags: []string{
-				stakingKeyFlag,
-				stakingCertFlag,
-				stakingSigningKeyFlag,
-				genesisFlag,
-				configFileFlag,
-				chainConfigDirFlag,
-				subnetConfigDirFlag,
+			expectedFlags: map[string]string{
+				config.StakingTLSKeyPathKey:    stakingKeyPath,
+				config.StakingCertPathKey:      stakingCertPath,
+				config.StakingSignerKeyPathKey: stakingSigningKeyPath,
+				config.GenesisConfigFileKey:    genesisPath,
+				config.ChainConfigDirKey:       chainConfigDir,
+				config.SubnetConfigDirKey:      subnetConfigDir,
+				config.ConfigFileKey:           configFilePath,
 			},
 		},
 		{
@@ -1198,14 +1216,14 @@ func TestWriteFiles(t *testing.T) {
 				ConfigFile:       configFile,
 				ChainConfigFiles: chainConfigFiles,
 			},
-			expectedFlags: []string{
-				stakingKeyFlag,
-				stakingCertFlag,
-				stakingSigningKeyFlag,
-				genesisFlag,
-				configFileFlag,
-				chainConfigDirFlag,
-				subnetConfigDirFlag,
+			expectedFlags: map[string]string{
+				config.StakingTLSKeyPathKey:    stakingKeyPath,
+				config.StakingCertPathKey:      stakingCertPath,
+				config.StakingSignerKeyPathKey: stakingSigningKeyPath,
+				config.GenesisConfigFileKey:    genesisPath,
+				config.ChainConfigDirKey:       chainConfigDir,
+				config.SubnetConfigDirKey:      subnetConfigDir,
+				config.ConfigFileKey:           configFilePath,
 			},
 		},
 	}
@@ -1213,14 +1231,17 @@ func TestWriteFiles(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			require := require.New(t)
-			flags, err := writeFiles(tt.genesis, tmpDir, &tt.nodeConfig)
+			flags, err := writeFiles(0, tt.genesis, tmpDir, &tt.nodeConfig)
 			if tt.shouldErr {
 				require.Error(err)
 				return
 			}
 			require.NoError(err)
 			// Make sure returned flags are right
-			require.ElementsMatch(tt.expectedFlags, flags)
+			require.Len(tt.expectedFlags, len(flags))
+			for k := range flags {
+				require.Equal(tt.expectedFlags[k], flags[k])
+			}
 			// Assert files created correctly
 			gotStakingKey, err := os.ReadFile(stakingKeyPath)
 			require.NoError(err)
@@ -1270,10 +1291,10 @@ func TestRemoveBeacon(t *testing.T) {
 }
 
 // Returns an API client where:
-// * The Health API's Health method always returns an error after the
-//   given context is cancelled.
-// * The CChainEthAPI's Close method may be called
-// * Only the above 2 methods may be called
+//   - The Health API's Health method always returns an error after the
+//     given context is cancelled.
+//   - The CChainEthAPI's Close method may be called
+//   - Only the above 2 methods may be called
 func newMockAPIHealthyBlocks(string, uint16) api.Client {
 	healthClient := &healthmocks.Client{}
 	healthClient.On("Health", mock.MatchedBy(func(_ context.Context) bool {

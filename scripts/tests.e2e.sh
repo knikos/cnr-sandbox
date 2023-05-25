@@ -107,7 +107,7 @@ ACK_GINKGO_RC=true ginkgo build ./tests/e2e
 snapshots_dir=/tmp/camino-network-runner-snapshots-e2e/
 rm -rf $snapshots_dir
 
-killall network.runner || echo
+killall avalanche-network-runner || true
 
 echo "launch local test cluster in the background"
 bin/camino-network-runner \
@@ -118,9 +118,17 @@ server \
 --grpc-gateway-port=":8081" &
 PID=${!}
 
+function cleanup()
+{
+  echo "shutting down network runner"
+  kill ${PID}
+}
+trap cleanup EXIT
+
 echo "running e2e tests"
 ./tests/e2e/e2e.test \
 --ginkgo.v \
+--ginkgo.fail-fast \
 --log-level debug \
 --grpc-endpoint="0.0.0.0:8080" \
 --grpc-gateway-endpoint="0.0.0.0:8081" \

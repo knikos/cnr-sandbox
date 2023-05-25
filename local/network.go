@@ -12,6 +12,8 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+	"regexp"
+	"strings"
 	"sync"
 	"time"
 
@@ -29,8 +31,11 @@ import (
 	"github.com/ava-labs/avalanchego/utils/crypto/bls"
 	"github.com/ava-labs/avalanchego/utils/ips"
 	"github.com/ava-labs/avalanchego/utils/logging"
+	"github.com/ava-labs/avalanchego/utils/set"
 	"github.com/ava-labs/avalanchego/utils/wrappers"
 	"go.uber.org/zap"
+	"golang.org/x/exp/maps"
+	"golang.org/x/mod/semver"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -51,8 +56,6 @@ const (
 	defaultLogsSubdir         = "logs"
 	// difference between unlock schedule locktime and startime in original genesis
 	genesisLocktimeStartimeDelta = 2836800
-	// TODO: replace with config.PluginDirKey when included in avalanchego
-	PluginDirKey = "plugin-dir"
 )
 
 // interface compliance
@@ -114,9 +117,19 @@ type localNetwork struct {
 	reassignPortsIfUsed bool
 }
 
+type deprecatedFlagEsp struct {
+	Version  string `json:"version"`
+	OldName  string `json:"old_name"`
+	NewName  string `json:"new_name"`
+	ValueMap string `json:"value_map"`
+}
+
 var (
 	//go:embed default
 	embeddedDefaultNetworkConfigDir embed.FS
+	//go:embed deprecatedFlagsSupport.json
+	deprecatedFlagsSupportBytes []byte
+	deprecatedFlagsSupport      []deprecatedFlagEsp
 	// Pre-defined network configuration.
 	// [defaultNetworkConfig] should not be modified.
 	// TODO add method Copy() to network.Config to prevent
@@ -131,6 +144,10 @@ func init() {
 	// load genesis, updating validation start time
 	genesisMap, err := network.LoadLocalGenesis()
 	if err != nil {
+		panic(err)
+	}
+	// load deprecated avago flags support information
+	if err = json.Unmarshal(deprecatedFlagsSupportBytes, &deprecatedFlagsSupport); err != nil {
 		panic(err)
 	}
 
@@ -350,22 +367,6 @@ func NewDefaultNetwork(
 	return NewNetwork(log, config, "", "", reassignPortsIfUsed)
 }
 
-func copyMapStringInterface(flags map[string]interface{}) map[string]interface{} {
-	outFlags := map[string]interface{}{}
-	for k, v := range flags {
-		outFlags[k] = v
-	}
-	return outFlags
-}
-
-func copyMapStringString(flags map[string]string) map[string]string {
-	outFlags := map[string]string{}
-	for k, v := range flags {
-		outFlags[k] = v
-	}
-	return outFlags
-}
-
 // NewDefaultConfig creates a new default network config
 func NewDefaultConfig(binaryPath string) network.Config {
 	config := defaultNetworkConfig
@@ -374,10 +375,10 @@ func NewDefaultConfig(binaryPath string) network.Config {
 	config.NodeConfigs = make([]node.Config, len(defaultNetworkConfig.NodeConfigs))
 	copy(config.NodeConfigs, defaultNetworkConfig.NodeConfigs)
 	// copy maps
-	config.ChainConfigFiles = copyMapStringString(config.ChainConfigFiles)
-	config.Flags = copyMapStringInterface(config.Flags)
+	config.ChainConfigFiles = maps.Clone(config.ChainConfigFiles)
+	config.Flags = maps.Clone(config.Flags)
 	for i := range config.NodeConfigs {
-		config.NodeConfigs[i].Flags = copyMapStringInterface(config.NodeConfigs[i].Flags)
+		config.NodeConfigs[i].Flags = maps.Clone(config.NodeConfigs[i].Flags)
 	}
 	return config
 }
@@ -557,6 +558,8 @@ func (ln *localNetwork) addNode(nodeConfig node.Config) (node.Node, error) {
 		return nil, err
 	}
 
+	isPausedNode := ln.isPausedNode(&nodeConfig)
+
 	nodeDir, err := makeNodeDir(ln.log, ln.rootDir, nodeConfig.Name)
 	if err != nil {
 		return nil, err
@@ -570,7 +573,13 @@ func (ln *localNetwork) addNode(nodeConfig node.Config) (node.Node, error) {
 		}
 	}
 
-	nodeData, err := ln.buildFlags(configFile, nodeDir, &nodeConfig)
+	// Get node version
+	nodeSemVer, err := ln.getNodeSemVer(nodeConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	nodeData, err := ln.buildArgs(nodeSemVer, configFile, nodeDir, &nodeConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -582,18 +591,18 @@ func (ln *localNetwork) addNode(nodeConfig node.Config) (node.Node, error) {
 	}
 
 	// Start the camino node and pass it the flags defined above
-	nodeProcess, err := ln.nodeProcessCreator.NewNodeProcess(nodeConfig, nodeData.flags...)
+	nodeProcess, err := ln.nodeProcessCreator.NewNodeProcess(nodeConfig, nodeData.args...)
 	if err != nil {
 		return nil, fmt.Errorf(
-			"couldn't create new node process with binary %q and flags %v: %w",
-			nodeConfig.BinaryPath, nodeData.flags, err,
+			"couldn't create new node process with binary %q and args %v: %w",
+			nodeConfig.BinaryPath, nodeData.args, err,
 		)
 	}
 
 	ln.log.Info(
 		"adding node",
 		zap.String("node-name", nodeConfig.Name),
-		zap.String("node-dir", nodeDir),
+		zap.String("node-dir", nodeData.dataDir),
 		zap.String("log-dir", nodeData.logsDir),
 		zap.String("db-dir", nodeData.dbDir),
 		zap.Uint16("p2p-port", nodeData.p2pPort),
@@ -604,7 +613,7 @@ func (ln *localNetwork) addNode(nodeConfig node.Config) (node.Node, error) {
 		"starting node",
 		zap.String("name", nodeConfig.Name),
 		zap.String("binaryPath", nodeConfig.BinaryPath),
-		zap.Strings("flags", nodeData.flags),
+		zap.Strings("args", nodeData.args),
 	)
 
 	// Create a wrapper for this node so we can reference it later
@@ -617,6 +626,7 @@ func (ln *localNetwork) addNode(nodeConfig node.Config) (node.Node, error) {
 		apiPort:       nodeData.apiPort,
 		p2pPort:       nodeData.p2pPort,
 		getConnFunc:   defaultGetConnFunc,
+		dataDir:       nodeData.dataDir,
 		dbDir:         nodeData.dbDir,
 		logsDir:       nodeData.logsDir,
 		config:        nodeConfig,
@@ -628,7 +638,7 @@ func (ln *localNetwork) addNode(nodeConfig node.Config) (node.Node, error) {
 	// If this node is a beacon, add its IP/ID to the beacon lists.
 	// Note that we do this *after* we set this node's bootstrap IPs/IDs
 	// so this node won't try to use itself as a beacon.
-	if nodeConfig.IsBeacon {
+	if !isPausedNode && nodeConfig.IsBeacon {
 		err = ln.bootstraps.Add(beacon.New(nodeID, ips.IPPort{
 			IP:   net.IPv6loopback,
 			Port: nodeData.p2pPort,
@@ -641,6 +651,7 @@ func (ln *localNetwork) addNode(nodeConfig node.Config) (node.Node, error) {
 func (ln *localNetwork) Healthy(ctx context.Context) error {
 	ln.lock.RLock()
 	defer ln.lock.RUnlock()
+
 	return ln.healthy(ctx)
 }
 
@@ -653,7 +664,7 @@ func (ln *localNetwork) healthy(ctx context.Context) error {
 	}
 
 	// Derive a new context that's cancelled when Stop is called,
-	// so that we calls to Healthy() below immediately return.
+	// so that calls to Healthy() below immediately return.
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	go func(ctx context.Context) {
@@ -668,6 +679,10 @@ func (ln *localNetwork) healthy(ctx context.Context) error {
 
 	errGr, ctx := errgroup.WithContext(ctx)
 	for _, node := range ln.nodes {
+		if node.paused {
+			// no health check for paused nodes
+			continue
+		}
 		node := node
 		nodeName := node.GetName()
 		errGr.Go(func() error {
@@ -721,13 +736,7 @@ func (ln *localNetwork) GetNodeNames() ([]string, error) {
 		return nil, network.ErrStopped
 	}
 
-	names := make([]string, len(ln.nodes))
-	i := 0
-	for name := range ln.nodes {
-		names[i] = name
-		i++
-	}
-	return names, nil
+	return maps.Keys(ln.nodes), nil
 }
 
 // See network.Network
@@ -780,6 +789,7 @@ func (ln *localNetwork) stop(ctx context.Context) error {
 func (ln *localNetwork) RemoveNode(ctx context.Context, nodeName string) error {
 	ln.lock.Lock()
 	defer ln.lock.Unlock()
+
 	if ln.stopCalled() {
 		return network.ErrStopped
 	}
@@ -794,27 +804,99 @@ func (ln *localNetwork) removeNode(ctx context.Context, nodeName string) error {
 		return fmt.Errorf("node %q not found", nodeName)
 	}
 
+	paused := node.paused
+
 	// If the node wasn't a beacon, we don't care
 	_ = ln.bootstraps.RemoveByID(node.nodeID)
-
 	delete(ln.nodes, nodeName)
+
+	if !paused {
+		// cchain eth api uses a websocket connection and must be closed before stopping the node,
+		// to avoid errors logs at client
+		node.client.CChainEthAPI().Close()
+		if exitCode := node.process.Stop(ctx); exitCode != 0 {
+			return fmt.Errorf("node %q exited with exit code: %d", nodeName, exitCode)
+		}
+	}
+	return nil
+}
+
+// Sends a SIGTERM to the given node and keeps it in the network with paused state
+func (ln *localNetwork) PauseNode(ctx context.Context, nodeName string) error {
+	ln.lock.Lock()
+	defer ln.lock.Unlock()
+	if ln.stopCalled() {
+		return network.ErrStopped
+	}
+	return ln.pauseNode(ctx, nodeName)
+}
+
+// Assumes [ln.lock] is held.
+func (ln *localNetwork) pauseNode(ctx context.Context, nodeName string) error {
+	ln.log.Debug("pausing node", zap.String("name", nodeName))
+	node, ok := ln.nodes[nodeName]
+	if !ok {
+		return fmt.Errorf("node %q not found", nodeName)
+	}
+	if node.paused {
+		return fmt.Errorf("node has been paused already")
+	}
 	// cchain eth api uses a websocket connection and must be closed before stopping the node,
 	// to avoid errors logs at client
 	node.client.CChainEthAPI().Close()
 	if exitCode := node.process.Stop(ctx); exitCode != 0 {
 		return fmt.Errorf("node %q exited with exit code: %d", nodeName, exitCode)
 	}
+	node.paused = true
+	return nil
+}
+
+// Resume previously paused [nodeName] using the same config.
+func (ln *localNetwork) ResumeNode(
+	ctx context.Context,
+	nodeName string,
+) error {
+	ln.lock.Lock()
+	defer ln.lock.Unlock()
+
+	return ln.resumeNode(
+		ctx,
+		nodeName,
+	)
+}
+
+// Assumes [ln.lock] is held.
+func (ln *localNetwork) resumeNode(
+	_ context.Context,
+	nodeName string,
+) error {
+	node, ok := ln.nodes[nodeName]
+	if !ok {
+		return fmt.Errorf("node %q not found", nodeName)
+	}
+	if !node.paused {
+		return fmt.Errorf("node has not been paused")
+	}
+	nodeConfig := node.GetConfig()
+	nodeConfig.Flags[config.DataDirKey] = node.GetDataDir()
+	nodeConfig.Flags[config.DBPathKey] = node.GetDbDir()
+	nodeConfig.Flags[config.LogsDirKey] = node.GetLogsDir()
+	nodeConfig.Flags[config.HTTPPortKey] = int(node.GetAPIPort())
+	nodeConfig.Flags[config.StakingPortKey] = int(node.GetP2PPort())
+	if _, err := ln.addNode(nodeConfig); err != nil {
+		return err
+	}
 	return nil
 }
 
 // Restart [nodeName] using the same config, optionally changing [binaryPath],
-// [whitelistedSubnets]
+// [pluginDir], [trackSubnets], [chainConfigs], [upgradeConfigs], [subnetConfigs]
 func (ln *localNetwork) RestartNode(
 	ctx context.Context,
 	nodeName string,
 	binaryPath string,
 	pluginDir string,
-	whitelistedSubnets string,
+	trackSubnets string,
 	chainConfigs map[string]string,
 	upgradeConfigs map[string]string,
 	subnetConfigs map[string]string,
@@ -827,7 +909,7 @@ func (ln *localNetwork) RestartNode(
 		nodeName,
 		binaryPath,
 		pluginDir,
-		whitelistedSubnets,
+		trackSubnets,
 		chainConfigs,
 		upgradeConfigs,
 		subnetConfigs,
@@ -839,7 +921,7 @@ func (ln *localNetwork) restartNode(
 	nodeName string,
 	binaryPath string,
 	pluginDir string,
-	whitelistedSubnets string,
+	trackSubnets string,
 	chainConfigs map[string]string,
 	upgradeConfigs map[string]string,
 	subnetConfigs map[string]string,
@@ -855,15 +937,17 @@ func (ln *localNetwork) restartNode(
 		nodeConfig.BinaryPath = binaryPath
 	}
 	if pluginDir != "" {
-		nodeConfig.Flags[PluginDirKey] = pluginDir
+		nodeConfig.Flags[config.PluginDirKey] = pluginDir
 	}
 
-	if whitelistedSubnets != "" {
-		nodeConfig.Flags[config.WhitelistedSubnetsKey] = whitelistedSubnets
+	if trackSubnets != "" {
+		nodeConfig.Flags[config.TrackSubnetsKey] = trackSubnets
 	}
 
 	// keep same ports, dbdir in node flags
+	nodeConfig.Flags[config.DataDirKey] = node.GetDataDir()
 	nodeConfig.Flags[config.DBPathKey] = node.GetDbDir()
+	nodeConfig.Flags[config.LogsDirKey] = node.GetLogsDir()
 	nodeConfig.Flags[config.HTTPPortKey] = int(node.GetAPIPort())
 	nodeConfig.Flags[config.StakingPortKey] = int(node.GetP2PPort())
 	// apply chain configs
@@ -879,8 +963,10 @@ func (ln *localNetwork) restartNode(
 		nodeConfig.SubnetConfigFiles[k] = v
 	}
 
-	if err := ln.removeNode(ctx, nodeName); err != nil {
-		return err
+	if !node.paused {
+		if err := ln.removeNode(ctx, nodeName); err != nil {
+			return err
+		}
 	}
 
 	if _, err := ln.addNode(nodeConfig); err != nil {
@@ -900,6 +986,13 @@ func (ln *localNetwork) stopCalled() bool {
 	}
 }
 
+func (ln *localNetwork) isPausedNode(nodeConfig *node.Config) bool {
+	if node, ok := ln.nodes[nodeConfig.Name]; ok && node.paused {
+		return true
+	}
+	return false
+}
+
 // Set [nodeConfig].Name if it isn't given and assert it's unique.
 func (ln *localNetwork) setNodeName(nodeConfig *node.Config) error {
 	// If no name was given, use default name pattern
@@ -914,91 +1007,104 @@ func (ln *localNetwork) setNodeName(nodeConfig *node.Config) error {
 		}
 	}
 	// Enforce name uniqueness
-	if _, ok := ln.nodes[nodeConfig.Name]; ok {
+	// Only paused nodes are enabled to be started with repeated name
+	if node, ok := ln.nodes[nodeConfig.Name]; ok && !node.paused {
 		return fmt.Errorf("repeated node name %q", nodeConfig.Name)
 	}
 	return nil
 }
 
-type buildFlagsReturn struct {
-	flags     []string
+type buildArgsReturn struct {
+	args      []string
 	apiPort   uint16
 	p2pPort   uint16
+	dataDir   string
 	dbDir     string
 	logsDir   string
 	pluginDir string
 	httpHost  string
 }
 
-// buildFlags returns the:
-// 1) Flags
+// buildArgs returns the:
+// 1) Args for avago execution
 // 2) API port
 // 3) P2P port
 // of the node being added with config [nodeConfig], config file [configFile],
 // and directory at [nodeDir].
 // [nodeConfig.Flags] must not be nil
-func (ln *localNetwork) buildFlags(
+func (ln *localNetwork) buildArgs(
+	nodeSemVer string,
 	configFile map[string]interface{},
 	nodeDir string,
 	nodeConfig *node.Config,
-) (buildFlagsReturn, error) {
+) (buildArgsReturn, error) {
 	// httpHost from all configs for node
 	httpHost, err := getConfigEntry(nodeConfig.Flags, configFile, config.HTTPHostKey, "")
 	if err != nil {
-		return buildFlagsReturn{}, err
+		return buildArgsReturn{}, err
+	}
+
+	// Tell the node to put all node related data in [nodeDir] unless given in config file
+	dataDir, err := getConfigEntry(nodeConfig.Flags, configFile, config.DataDirKey, nodeDir)
+	if err != nil {
+		return buildArgsReturn{}, err
 	}
 
 	// pluginDir from all configs for node
-	pluginDir, err := getConfigEntry(nodeConfig.Flags, configFile, PluginDirKey, "")
+	pluginDir, err := getConfigEntry(nodeConfig.Flags, configFile, config.PluginDirKey, "")
 	if err != nil {
-		return buildFlagsReturn{}, err
+		return buildArgsReturn{}, err
 	}
 
-	// Tell the node to put the database in [nodeDir] unless given in config file
-	dbDir, err := getConfigEntry(nodeConfig.Flags, configFile, config.DBPathKey, filepath.Join(nodeDir, defaultDBSubdir))
+	// Tell the node to put the database in [dataDir/db] unless given in config file
+	dbDir, err := getConfigEntry(nodeConfig.Flags, configFile, config.DBPathKey, filepath.Join(dataDir, defaultDBSubdir))
 	if err != nil {
-		return buildFlagsReturn{}, err
+		return buildArgsReturn{}, err
 	}
 
-	// Tell the node to put the log directory in [nodeDir/logs] unless given in config file
-	logsDir, err := getConfigEntry(nodeConfig.Flags, configFile, config.LogsDirKey, filepath.Join(nodeDir, defaultLogsSubdir))
+	// Tell the node to put the log directory in [dataDir/logs] unless given in config file
+	logsDir, err := getConfigEntry(nodeConfig.Flags, configFile, config.LogsDirKey, filepath.Join(dataDir, defaultLogsSubdir))
 	if err != nil {
-		return buildFlagsReturn{}, err
+		return buildArgsReturn{}, err
 	}
 
 	// Use random free API port unless given in config file
 	apiPort, err := getPort(nodeConfig.Flags, configFile, config.HTTPPortKey, ln.reassignPortsIfUsed)
 	if err != nil {
-		return buildFlagsReturn{}, err
+		return buildArgsReturn{}, err
 	}
 
 	// Use a random free P2P (staking) port unless given in config file
 	// Use random free API port unless given in config file
 	p2pPort, err := getPort(nodeConfig.Flags, configFile, config.StakingPortKey, ln.reassignPortsIfUsed)
 	if err != nil {
-		return buildFlagsReturn{}, err
+		return buildArgsReturn{}, err
 	}
 
 	// Flags for CaminoNode
-	flags := []string{
-		fmt.Sprintf("--%s=%d", config.NetworkNameKey, ln.networkID),
-		fmt.Sprintf("--%s=%s", config.DBPathKey, dbDir),
-		fmt.Sprintf("--%s=%s", config.LogsDirKey, logsDir),
-		fmt.Sprintf("--%s=%d", config.HTTPPortKey, apiPort),
-		fmt.Sprintf("--%s=%d", config.StakingPortKey, p2pPort),
-		fmt.Sprintf("--%s=%s", config.BootstrapIPsKey, ln.bootstraps.IPsArg()),
-		fmt.Sprintf("--%s=%s", config.BootstrapIDsKey, ln.bootstraps.IDsArg()),
+	flags := map[string]string{
+		config.NetworkNameKey:  fmt.Sprintf("%d", ln.networkID),
+		config.DataDirKey:      dataDir,
+		config.DBPathKey:       dbDir,
+		config.LogsDirKey:      logsDir,
+		config.HTTPPortKey:     fmt.Sprintf("%d", apiPort),
+		config.StakingPortKey:  fmt.Sprintf("%d", p2pPort),
+		config.BootstrapIPsKey: ln.bootstraps.IPsArg(),
+		config.BootstrapIDsKey: ln.bootstraps.IDsArg(),
 	}
+
 	// Write staking key/cert etc. to disk so the new node can use them,
 	// and get flag that point the node to those files
-	fileFlags, err := writeFiles(ln.genesis, nodeDir, nodeConfig)
+	fileFlags, err := writeFiles(ln.networkID, ln.genesis, dataDir, nodeConfig)
 	if err != nil {
-		return buildFlagsReturn{}, err
+		return buildArgsReturn{}, err
 	}
-	flags = append(flags, fileFlags...)
+	for k := range fileFlags {
+		flags[k] = fileFlags[k]
+	}
 
 	// avoid given these again, as apiPort/p2pPort can be dynamic even if given in nodeConfig
-	portFlags := map[string]struct{}{
+	portFlags := set.Set[string]{
 		config.HTTPPortKey:    {},
 		config.StakingPortKey: {},
 	}
@@ -1009,19 +1115,70 @@ func (ln *localNetwork) buildFlags(
 		if _, ok := warnFlags[flagName]; ok {
 			ln.log.Warn("A provided flag can create conflicts with the runner. The suggestion is to remove this flag", zap.String("flag-name", flagName))
 		}
-		if _, ok := portFlags[flagName]; ok {
+		if portFlags.Contains(flagName) {
 			continue
 		}
-		flags = append(flags, fmt.Sprintf("--%s=%v", flagName, flagVal))
+		flags[flagName] = fmt.Sprintf("%v", flagVal)
 	}
 
-	return buildFlagsReturn{
-		flags:     flags,
+	// map input flags to the corresponding avago version, making sure that latest flags don't break
+	// old avago versions
+	flagsForAvagoVersion := getFlagsForAvagoVersion(nodeSemVer, flags)
+
+	// create args
+	args := []string{}
+	for k, v := range flagsForAvagoVersion {
+		args = append(args, fmt.Sprintf("--%s=%s", k, v))
+	}
+
+	return buildArgsReturn{
+		args:      args,
 		apiPort:   apiPort,
 		p2pPort:   p2pPort,
+		dataDir:   dataDir,
 		dbDir:     dbDir,
 		logsDir:   logsDir,
 		pluginDir: pluginDir,
 		httpHost:  httpHost,
 	}, nil
+}
+
+// Get AvalancheGo version
+func (ln *localNetwork) getNodeSemVer(nodeConfig node.Config) (string, error) {
+	nodeVersionOutput, err := ln.nodeProcessCreator.GetNodeVersion(nodeConfig)
+	if err != nil {
+		return "", fmt.Errorf(
+			"couldn't get node version with binary %q: %w",
+			nodeConfig.BinaryPath, err,
+		)
+	}
+	re := regexp.MustCompile(`\/([^ ]+)`)
+	matchs := re.FindStringSubmatch(nodeVersionOutput)
+	if len(matchs) != 2 {
+		return "", fmt.Errorf(
+			"invalid version output %q for binary %q: version pattern not found",
+			nodeVersionOutput, nodeConfig.BinaryPath,
+		)
+	}
+	nodeSemVer := "v" + matchs[1]
+	return nodeSemVer, nil
+}
+
+// ensure flags are compatible with the running avalanchego version
+func getFlagsForAvagoVersion(avagoVersion string, givenFlags map[string]string) map[string]string {
+	flags := maps.Clone(givenFlags)
+	for _, deprecatedFlagInfo := range deprecatedFlagsSupport {
+		if semver.Compare(avagoVersion, deprecatedFlagInfo.Version) < 0 {
+			if v, ok := flags[deprecatedFlagInfo.NewName]; ok {
+				if v != "" {
+					if deprecatedFlagInfo.ValueMap == "parent-dir" {
+						v = filepath.Dir(strings.TrimSuffix(v, "/"))
+					}
+					flags[deprecatedFlagInfo.OldName] = v
+				}
+				delete(flags, deprecatedFlagInfo.NewName)
+			}
+		}
+	}
+	return flags
 }

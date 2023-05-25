@@ -29,14 +29,18 @@ type Config struct {
 
 type Client interface {
 	Ping(ctx context.Context) (*rpcpb.PingResponse, error)
+	RPCVersion(ctx context.Context) (*rpcpb.RPCVersionResponse, error)
 	Start(ctx context.Context, execPath string, opts ...OpOption) (*rpcpb.StartResponse, error)
 	CreateBlockchains(ctx context.Context, blockchainSpecs []*rpcpb.BlockchainSpec) (*rpcpb.CreateBlockchainsResponse, error)
-	CreateSubnets(ctx context.Context, opts ...OpOption) (*rpcpb.CreateSubnetsResponse, error)
+	CreateSubnets(ctx context.Context, subnetSpecs []*rpcpb.SubnetSpec) (*rpcpb.CreateSubnetsResponse, error)
 	Health(ctx context.Context) (*rpcpb.HealthResponse, error)
+	WaitForHealthy(ctx context.Context) (*rpcpb.WaitForHealthyResponse, error)
 	URIs(ctx context.Context) ([]string, error)
 	Status(ctx context.Context) (*rpcpb.StatusResponse, error)
 	StreamStatus(ctx context.Context, pushInterval time.Duration) (<-chan *rpcpb.ClusterInfo, error)
 	RemoveNode(ctx context.Context, name string) (*rpcpb.RemoveNodeResponse, error)
+	PauseNode(ctx context.Context, name string) (*rpcpb.PauseNodeResponse, error)
+	ResumeNode(ctx context.Context, name string) (*rpcpb.ResumeNodeResponse, error)
 	RestartNode(ctx context.Context, name string, opts ...OpOption) (*rpcpb.RestartNodeResponse, error)
 	AddNode(ctx context.Context, name string, execPath string, opts ...OpOption) (*rpcpb.AddNodeResponse, error)
 	Stop(ctx context.Context) (*rpcpb.StopResponse, error)
@@ -95,6 +99,11 @@ func (c *client) Ping(ctx context.Context) (*rpcpb.PingResponse, error) {
 	return c.pingc.Ping(ctx, &rpcpb.PingRequest{})
 }
 
+func (c *client) RPCVersion(ctx context.Context) (*rpcpb.RPCVersionResponse, error) {
+	c.log.Info("rpc version")
+	return c.controlc.RPCVersion(ctx, &rpcpb.RPCVersionRequest{})
+}
+
 func (c *client) Start(ctx context.Context, execPath string, opts ...OpOption) (*rpcpb.StartResponse, error) {
 	ret := &Op{numNodes: local.DefaultNumNodes}
 	ret.applyOpts(opts)
@@ -106,8 +115,8 @@ func (c *client) Start(ctx context.Context, execPath string, opts ...OpOption) (
 		UpgradeConfigs: ret.upgradeConfigs,
 		SubnetConfigs:  ret.subnetConfigs,
 	}
-	if ret.whitelistedSubnets != "" {
-		req.WhitelistedSubnets = &ret.whitelistedSubnets
+	if ret.trackSubnets != "" {
+		req.WhitelistedSubnets = &ret.trackSubnets
 	}
 	if ret.rootDataDir != "" {
 		req.RootDataDir = &ret.rootDataDir
@@ -140,14 +149,9 @@ func (c *client) CreateBlockchains(ctx context.Context, blockchainSpecs []*rpcpb
 	return c.controlc.CreateBlockchains(ctx, req)
 }
 
-func (c *client) CreateSubnets(ctx context.Context, opts ...OpOption) (*rpcpb.CreateSubnetsResponse, error) {
-	ret := &Op{}
-	ret.applyOpts(opts)
-
-	req := &rpcpb.CreateSubnetsRequest{}
-
-	if ret.numSubnets != 0 {
-		req.NumSubnets = &ret.numSubnets
+func (c *client) CreateSubnets(ctx context.Context, subnetSpecs []*rpcpb.SubnetSpec) (*rpcpb.CreateSubnetsResponse, error) {
+	req := &rpcpb.CreateSubnetsRequest{
+		SubnetSpecs: subnetSpecs,
 	}
 
 	c.log.Info("create subnets")
@@ -157,6 +161,11 @@ func (c *client) CreateSubnets(ctx context.Context, opts ...OpOption) (*rpcpb.Cr
 func (c *client) Health(ctx context.Context) (*rpcpb.HealthResponse, error) {
 	c.log.Info("health")
 	return c.controlc.Health(ctx, &rpcpb.HealthRequest{})
+}
+
+func (c *client) WaitForHealthy(ctx context.Context) (*rpcpb.WaitForHealthyResponse, error) {
+	c.log.Info("wait for healthy")
+	return c.controlc.WaitForHealthy(ctx, &rpcpb.WaitForHealthyRequest{})
 }
 
 func (c *client) URIs(ctx context.Context) ([]string, error) {
@@ -251,6 +260,16 @@ func (c *client) RemoveNode(ctx context.Context, name string) (*rpcpb.RemoveNode
 	return c.controlc.RemoveNode(ctx, &rpcpb.RemoveNodeRequest{Name: name})
 }
 
+func (c *client) PauseNode(ctx context.Context, name string) (*rpcpb.PauseNodeResponse, error) {
+	c.log.Info("pause node", zap.String("name", name))
+	return c.controlc.PauseNode(ctx, &rpcpb.PauseNodeRequest{Name: name})
+}
+
+func (c *client) ResumeNode(ctx context.Context, name string) (*rpcpb.ResumeNodeResponse, error) {
+	c.log.Info("resume node", zap.String("name", name))
+	return c.controlc.ResumeNode(ctx, &rpcpb.ResumeNodeRequest{Name: name})
+}
+
 func (c *client) RestartNode(ctx context.Context, name string, opts ...OpOption) (*rpcpb.RestartNodeResponse, error) {
 	ret := &Op{}
 	ret.applyOpts(opts)
@@ -262,8 +281,8 @@ func (c *client) RestartNode(ctx context.Context, name string, opts ...OpOption)
 	if ret.pluginDir != "" {
 		req.PluginDir = ret.pluginDir
 	}
-	if ret.whitelistedSubnets != "" {
-		req.WhitelistedSubnets = &ret.whitelistedSubnets
+	if ret.trackSubnets != "" {
+		req.WhitelistedSubnets = &ret.trackSubnets
 	}
 	req.ChainConfigs = ret.chainConfigs
 	req.UpgradeConfigs = ret.upgradeConfigs
@@ -343,7 +362,7 @@ func (c *client) Close() error {
 type Op struct {
 	numNodes            uint32
 	execPath            string
-	whitelistedSubnets  string
+	trackSubnets        string
 	globalNodeConfig    string
 	rootDataDir         string
 	pluginDir           string
@@ -383,9 +402,15 @@ func WithExecPath(execPath string) OpOption {
 	}
 }
 
-func WithWhitelistedSubnets(whitelistedSubnets string) OpOption {
+func WithWhitelistedSubnets(trackSubnets string) OpOption {
 	return func(op *Op) {
-		op.whitelistedSubnets = whitelistedSubnets
+		op.trackSubnets = trackSubnets
+	}
+}
+
+func WithTrackSubnets(trackSubnets string) OpOption {
+	return func(op *Op) {
+		op.trackSubnets = trackSubnets
 	}
 }
 
