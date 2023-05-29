@@ -9,7 +9,7 @@ if ! [[ "$0" =~ scripts/tests.e2e.sh ]]; then
   exit 255
 fi
 
-DEFAULT_VERSION_1=0.4.1-rc1
+DEFAULT_VERSION_1=0.4.9-rc2
 DEFAULT_VERSION_2=0.4.1-rc2
 
 if [ $# == 0 ]; then
@@ -107,7 +107,7 @@ ACK_GINKGO_RC=true ginkgo build ./tests/e2e
 snapshots_dir=/tmp/camino-network-runner-snapshots-e2e/
 rm -rf $snapshots_dir
 
-killall avalanche-network-runner || true
+killall camino-network-runner || true
 
 echo "launch local test cluster in the background"
 bin/camino-network-runner \

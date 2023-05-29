@@ -1152,15 +1152,15 @@ func (ln *localNetwork) getNodeSemVer(nodeConfig node.Config) (string, error) {
 			nodeConfig.BinaryPath, err,
 		)
 	}
-	re := regexp.MustCompile(`\/([^ ]+)`)
-	matchs := re.FindStringSubmatch(nodeVersionOutput)
-	if len(matchs) != 2 {
+	re := regexp.MustCompile(`camino-node:\s+v([\d.]+)`)
+	matches := re.FindStringSubmatch(nodeVersionOutput)
+	if len(matches) != 2 {
 		return "", fmt.Errorf(
 			"invalid version output %q for binary %q: version pattern not found",
 			nodeVersionOutput, nodeConfig.BinaryPath,
 		)
 	}
-	nodeSemVer := "v" + matchs[1]
+	nodeSemVer := "v" + matches[1]
 	return nodeSemVer, nil
 }
 
