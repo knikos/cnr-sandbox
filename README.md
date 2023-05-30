@@ -17,6 +17,12 @@ To download a binary for the latest release, run:
 curl -sSfL https://raw.githubusercontent.com/chain4travel/camino-network-runner/chain4travel/scripts/install.sh | sh -s
 ```
 
+To install a specific version, just append the desired version to the command (must be an existing github tag like v1.3.1)
+
+```sh
+curl -sSfL https://raw.githubusercontent.com/chain4travel/camino-network-runner/chain4travel/scripts/install.sh | sh -s v1.3.1
+```
+
 The binary will be installed inside the `./bin` directory.
 
 To add the binary to your path, run
@@ -310,13 +316,41 @@ curl -X POST -k http://localhost:8081/v1/control/removesnapshot -d '{"snapshot_n
 camino-network-runner control remove-snapshot snapshotName
 ```
 
+To create 1 validated subnet, with all existing nodes as participants (requires network restart):
+
+```bash
+curl -X POST -k http://localhost:8081/v1/control/createsubnets -d '[{}]'
+
+# or
+camino-network-runner control create-subnets '[{}]'
+```
+
+To create 1 validated subnet, with some of existing nodes as participants (requires network restart):
+
+```bash
+curl -X POST -k http://localhost:8081/v1/control/createsubnets -d '[{"participants": ["node1", "node2"]}]'
+
+# or
+camino-network-runner control create-subnets '[{"participants": ["node1", "node2"]}]'
+```
+
+To create 1 validated subnet, with some of existing nodes and another new node as participants (requires network restart):
+
+```bash
+curl -X POST -k http://localhost:8081/v1/control/createsubnets -d '[{"participants": ["node1", "node2", "testNode"]}]'
+
+# or
+camino-network-runner control create-subnets '[{"participants": ["node1", "node2", "testNode"]}]'
+
+```
+
 To create N validated subnets (requires network restart):
 
 ```bash
-curl -X POST -k http://localhost:8081/v1/control/createsubnets -d '{"num_subnets":5}'
+curl -X POST -k http://localhost:8081/v1/control/createsubnets -d '[{}, {"participants": ["node1", "node2", "node3"]}, {"participants": ["node1", "node2", "testNode"]}]'
 
 # or
-camino-network-runner control create-subnets 5
+camino-network-runner control create-subnets '[{}, {"participants": ["node1", "node2", "node3"]}, {"participants": ["node1", "node2", "testNode"]}]'
 ```
 
 To create a blockchain without a subnet id (requires network restart):
@@ -344,6 +378,15 @@ curl -X POST -k http://localhost:8081/v1/control/createblockchains -d '{"pluginD
 
 # or
 camino-network-runner control create-blockchains '[{"vm_name":"'$VM_NAME'","genesis":"'$GENESIS_PATH'", "subnet_id": "'$SUBNET_ID'", "chain_config": "'$CHAIN_CONFIG_PATH'", "network_upgrade": "'$NETWORK_UPGRADE_PATH'", "subnet_config": "'$SUBNET_CONFIG_PATH'"}]' --plugin-dir $PLUGIN_DIR
+```
+
+To create a blockchain with a new subnet id with select nodes as participants (requires network restart):
+(New nodes will first be added as primary validators similar to the process in `create-subnets`)
+```bash
+curl -X POST -k http://localhost:8081/v1/control/createblockchains -d '{"pluginDir":"'$PLUGIN_DIR'","blockchainSpecs":[{"vm_name":"'$VM_NAME'","genesis":"'$GENESIS_PATH'", "subnet_spec": "{"participants": ["node1", "node2", "testNode"]}"]}'
+
+# or
+camino-network-runner control create-blockchains '[{"vm_name":"'$VM_NAME'","genesis":"'$GENESIS_PATH'", "subnet_spec": "{"participants": ["node1", "node2", "testNode"]}"]' --plugin-dir $PLUGIN_DIR
 ```
 
 Chain config can also be defined on a per node basis. For that, a per node chain config file is needed, which is a JSON that specifies the chain config per node. For example, given the following as the contents of the file with path `$PER_NODE_CHAIN_CONFIG`:
@@ -377,7 +420,7 @@ camino-network-runner control remove-node \
 --request-timeout=3m \
 --log-level debug \
 --endpoint="0.0.0.0:8080" \
---node-name node5
+node5
 ```
 
 To restart a node (in this case, the one named `node1`):
@@ -395,8 +438,8 @@ camino-network-runner control restart-node \
 --request-timeout=3m \
 --log-level debug \
 --endpoint="0.0.0.0:8080" \
---node-name node1 \
---camino-node ${CAMINO_NODE_EXEC_PATH}
+--camino-node ${CAMINO_NODE_EXEC_PATH} \
+node1 
 ```
 
 To add a node (in this case, a new node named `node99`):
@@ -414,8 +457,40 @@ camino-network-runner control add-node \
 --request-timeout=3m \
 --log-level debug \
 --endpoint="0.0.0.0:8080" \
---node-name node99 \
---camino-node ${CAMINO_NODE_EXEC_PATH}
+--camino-node ${CAMINO_NODE_EXEC_PATH} \
+node99 
+```
+
+To pause a node (in this case, node named `node99`):
+```bash
+# e.g., ${HOME}/go/src/github.com/chain4travel/camino-node/build/camino-node
+CAMINO_NODE_EXEC_PATH="camino-node"
+
+
+curl -X POST -k http://localhost:8081/v1/control/pausenode -d '{"name":"node99","logLevel":"INFO"}'
+
+# or
+camino-network-runner control pause-node \
+--request-timeout=3m \
+--log-level debug \
+--endpoint="0.0.0.0:8080" \
+node99 
+```
+
+To resume a paused node (in this case, node named `node99`):
+```bash
+# e.g., ${HOME}/go/src/github.com/chain4travel/camino-node/build/camino-node
+CAMINO_NODE_EXEC_PATH="camino-node"
+
+
+curl -X POST -k http://localhost:8081/v1/control/resumenode -d '{"name":"node99","logLevel":"INFO"}'
+
+# or
+camino-network-runner control resume-node \
+--request-timeout=3m \
+--log-level debug \
+--endpoint="0.0.0.0:8080" \
+node99 
 ```
 
 You can also provide additional flags that specify the node's config:

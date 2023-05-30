@@ -8,9 +8,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/ava-labs/avalanchego/network/peer"
-
+	rpcb "github.com/ava-labs/avalanche-network-runner/rpcpb"
 	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/network/peer"
 	"github.com/ava-labs/avalanchego/staking"
 )
 
@@ -101,4 +101,30 @@ func MkDirWithTimestamp(dirPrefix string) (string, error) {
 	currentTime := time.Now().Format(dirTimestampFormat)
 	dirName := dirPrefix + "_" + currentTime
 	return dirName, os.MkdirAll(dirName, os.ModePerm)
+}
+
+func VerifySubnetHasCorrectParticipants(
+	subnetParticipants []string,
+	cluster *rpcb.ClusterInfo,
+	subnetID string,
+) bool {
+	if cluster != nil {
+		participatingNodeNames := cluster.SubnetParticipants[subnetID].GetNodeNames()
+		var nodeIsInList bool
+		// Check that all subnet validators are equal to the node IDs added as participant in subnet creation
+		for _, node := range subnetParticipants {
+			nodeIsInList = false
+			for _, subnetValidator := range participatingNodeNames {
+				if subnetValidator == node {
+					nodeIsInList = true
+					break
+				}
+			}
+			if !nodeIsInList {
+				return false
+			}
+		}
+		return true
+	}
+	return false
 }

@@ -28,12 +28,12 @@ func init() {
 }
 
 var (
-	logLevel           string
-	whitelistedSubnets string
-	endpoint           string
-	dialTimeout        time.Duration
-	requestTimeout     time.Duration
-	log                logging.Logger
+	logLevel       string
+	trackSubnets   string
+	endpoint       string
+	dialTimeout    time.Duration
+	requestTimeout time.Duration
+	log            logging.Logger
 )
 
 // NOTE: Naming convention for node names is currently `node` + number, i.e. `node1,node2,node3,...node101`
@@ -50,15 +50,19 @@ func NewCommand() *cobra.Command {
 	cmd.PersistentFlags().DurationVar(&requestTimeout, "request-timeout", 3*time.Minute, "client request timeout")
 
 	cmd.AddCommand(
+		newRPCVersionCommand(),
 		newStartCommand(),
 		newCreateBlockchainsCommand(),
 		newCreateSubnetsCommand(),
 		newHealthCommand(),
+		newWaitForHealthyCommand(),
 		newURIsCommand(),
 		newStatusCommand(),
 		newStreamStatusCommand(),
 		newAddNodeCommand(),
 		newRemoveNodeCommand(),
+		newPauseNodeCommand(),
+		newResumeNodeCommand(),
 		newRestartNodeCommand(),
 		newAttachPeerCommand(),
 		newSendOutboundMessageCommand(),
@@ -98,13 +102,40 @@ var (
 	blockchainSpecsStr  string
 	customNodeConfigs   string
 	rootDataDir         string
-	numSubnets          uint32
 	chainConfigs        string
 	upgradeConfigs      string
 	subnetConfigs       string
 	reassignPortsIfUsed bool
 	dynamicPorts        bool
 )
+
+func newRPCVersionCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "rpc_version",
+		Short: "Requests RPC server version.",
+		RunE:  RPCVersionFunc,
+		Args:  cobra.ExactArgs(0),
+	}
+	return cmd
+}
+
+func RPCVersionFunc(*cobra.Command, []string) error {
+	cli, err := newClient()
+	if err != nil {
+		return err
+	}
+	defer cli.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), requestTimeout)
+	resp, err := cli.RPCVersion(ctx)
+	cancel()
+	if err != nil {
+		return err
+	}
+
+	ux.Print(log, logging.Green.Wrap("version response: %+v"), resp)
+	return nil
+}
 
 func newStartCommand() *cobra.Command {
 	cmd := &cobra.Command{
@@ -156,7 +187,7 @@ func newStartCommand() *cobra.Command {
 		"[optional] custom node configs as JSON string of map, for each node individually. Common entries override `global-node-config`, but can be combined. Invalidates `number-of-nodes` (provide all node configs if used).",
 	)
 	cmd.PersistentFlags().StringVar(
-		&whitelistedSubnets,
+		&trackSubnets,
 		"whitelisted-subnets",
 		"",
 		"[optional] whitelisted subnets (comma-separated)",
@@ -207,7 +238,7 @@ func startFunc(*cobra.Command, []string) error {
 	opts := []client.OpOption{
 		client.WithNumNodes(numNodes),
 		client.WithPluginDir(pluginDir),
-		client.WithWhitelistedSubnets(whitelistedSubnets),
+		client.WithTrackSubnets(trackSubnets),
 		client.WithRootDataDir(rootDataDir),
 		client.WithReassignPortsIfUsed(reassignPortsIfUsed),
 		client.WithDynamicPorts(dynamicPorts),
@@ -310,7 +341,7 @@ func createBlockchainsFunc(_ *cobra.Command, args []string) error {
 		return err
 	}
 
-	ux.Print(log, logging.Green.Wrap("deploy-blockchains response: %+v"), info)
+	ux.Print(log, logging.Green.Wrap("create-blockchains response: %+v"), info)
 	return nil
 }
 
@@ -319,39 +350,36 @@ func newCreateSubnetsCommand() *cobra.Command {
 		Use:   "create-subnets [options]",
 		Short: "Create subnets.",
 		RunE:  createSubnetsFunc,
-		Args:  cobra.ExactArgs(0),
+		Args:  cobra.ExactArgs(1),
 	}
-	cmd.PersistentFlags().Uint32Var(
-		&numSubnets,
-		"num-subnets",
-		0,
-		"number of subnets",
-	)
 	return cmd
 }
 
-func createSubnetsFunc(*cobra.Command, []string) error {
+func createSubnetsFunc(_ *cobra.Command, args []string) error {
 	cli, err := newClient()
 	if err != nil {
 		return err
 	}
 	defer cli.Close()
 
-	opts := []client.OpOption{
-		client.WithNumSubnets(numSubnets),
+	subnetSpecsStr := args[0]
+
+	subnetSpecs := []*rpcpb.SubnetSpec{}
+	if err := json.Unmarshal([]byte(subnetSpecsStr), &subnetSpecs); err != nil {
+		return err
 	}
 
 	ctx := getAsyncContext()
 
 	info, err := cli.CreateSubnets(
 		ctx,
-		opts...,
+		subnetSpecs,
 	)
 	if err != nil {
 		return err
 	}
 
-	ux.Print(log, logging.Green.Wrap("add-subnets response: %+v"), info)
+	ux.Print(log, logging.Green.Wrap("create-subnets response: %+v"), info)
 	return nil
 }
 
@@ -380,6 +408,34 @@ func healthFunc(*cobra.Command, []string) error {
 	}
 
 	ux.Print(log, logging.Green.Wrap("health response: %+v"), resp)
+	return nil
+}
+
+func newWaitForHealthyCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "wait-for-healthy [options]",
+		Short: "Wait until local cluster + custom vms are ready.",
+		RunE:  waitForHealthy,
+		Args:  cobra.ExactArgs(0),
+	}
+	return cmd
+}
+
+func waitForHealthy(*cobra.Command, []string) error {
+	cli, err := newClient()
+	if err != nil {
+		return err
+	}
+	defer cli.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), requestTimeout)
+	defer cancel()
+	resp, err := cli.WaitForHealthy(ctx)
+	if err != nil {
+		return err
+	}
+
+	ux.Print(log, logging.Green.Wrap("wait for healthy response: %+v"), resp)
 	return nil
 }
 
@@ -522,6 +578,66 @@ func removeNodeFunc(_ *cobra.Command, args []string) error {
 	return nil
 }
 
+func newPauseNodeCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "pause-node node-name [options]",
+		Short: "Pauses a node.",
+		RunE:  pauseNodeFunc,
+		Args:  cobra.ExactArgs(1),
+	}
+	return cmd
+}
+
+func pauseNodeFunc(_ *cobra.Command, args []string) error {
+	// no validation for empty string required, as covered by `cobra.ExactArgs`
+	nodeName := args[0]
+	cli, err := newClient()
+	if err != nil {
+		return err
+	}
+	defer cli.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), requestTimeout)
+	info, err := cli.PauseNode(ctx, nodeName)
+	cancel()
+	if err != nil {
+		return err
+	}
+
+	ux.Print(log, logging.Green.Wrap("pause node response: %+v"), info)
+	return nil
+}
+
+func newResumeNodeCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "resume-node node-name [options]",
+		Short: "Resumes a node.",
+		RunE:  resumeNodeFunc,
+		Args:  cobra.ExactArgs(1),
+	}
+	return cmd
+}
+
+func resumeNodeFunc(_ *cobra.Command, args []string) error {
+	// no validation for empty string required, as covered by `cobra.ExactArgs`
+	nodeName := args[0]
+	cli, err := newClient()
+	if err != nil {
+		return err
+	}
+	defer cli.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), requestTimeout)
+	info, err := cli.ResumeNode(ctx, nodeName)
+	cancel()
+	if err != nil {
+		return err
+	}
+
+	ux.Print(log, logging.Green.Wrap("resume node response: %+v"), info)
+	return nil
+}
+
 func newAddNodeCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "add-node node-name [options]",
@@ -540,6 +656,12 @@ func newAddNodeCommand() *cobra.Command {
 		"node-config",
 		"",
 		"node config as string",
+	)
+	cmd.PersistentFlags().StringVar(
+		&pluginDir,
+		"plugin-dir",
+		"",
+		"[optional] plugin directory",
 	)
 	cmd.PersistentFlags().StringVar(
 		&chainConfigs,
@@ -571,7 +693,9 @@ func addNodeFunc(_ *cobra.Command, args []string) error {
 	}
 	defer cli.Close()
 
-	opts := []client.OpOption{}
+	opts := []client.OpOption{
+		client.WithPluginDir(pluginDir),
+	}
 
 	if addNodeConfig != "" {
 		ux.Print(log, logging.Yellow.Wrap("WARNING: overriding node configs with custom provided config %s"), addNodeConfig)
@@ -635,10 +759,16 @@ func newRestartNodeCommand() *cobra.Command {
 		"camino-node binary path",
 	)
 	cmd.PersistentFlags().StringVar(
-		&whitelistedSubnets,
+		&trackSubnets,
 		"whitelisted-subnets",
 		"",
-		"whitelisted subnets (comma-separated)",
+		"[optional] whitelisted subnets (comma-separated)",
+	)
+	cmd.PersistentFlags().StringVar(
+		&pluginDir,
+		"plugin-dir",
+		"",
+		"[optional] plugin directory",
 	)
 	cmd.PersistentFlags().StringVar(
 		&chainConfigs,
@@ -672,7 +802,8 @@ func restartNodeFunc(_ *cobra.Command, args []string) error {
 
 	opts := []client.OpOption{
 		client.WithExecPath(caminoNodeBinPath),
-		client.WithWhitelistedSubnets(whitelistedSubnets),
+		client.WithPluginDir(pluginDir),
+		client.WithTrackSubnets(trackSubnets),
 	}
 
 	if chainConfigs != "" {

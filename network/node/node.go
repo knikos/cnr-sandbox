@@ -41,18 +41,22 @@ type Node interface {
 	Status() status.Status
 	// Return this node's Camino Node binary path
 	GetBinaryPath() string
+	// Return this node's data dir
+	GetDataDir() string
 	// Return this node's db dir
 	GetDbDir() string
 	// Return this node's logs dir
 	GetLogsDir() string
-	// Return this node's build dir
-	GetBuildDir() string
+	// Return this node's plugin dir
+	GetPluginDir() string
 	// Return this node's config file contents
 	GetConfigFile() string
 	// Return this node's config
 	GetConfig() Config
 	// Return this node's flag value
 	GetFlag(string) (string, error)
+	// Return this node's paused status
+	GetPaused() bool
 }
 
 // Config encapsulates an camino node configuration

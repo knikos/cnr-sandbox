@@ -72,7 +72,7 @@ func verifyProtocol(
 	}
 	now := uint64(time.Now().Unix())
 	unsignedIP := peer.UnsignedIP{
-		IP:        myIP,
+		IPPort:    myIP,
 		Timestamp: now,
 	}
 	signer := myTLSCert.PrivateKey.(crypto.Signer)
@@ -231,7 +231,7 @@ func TestAttachPeer(t *testing.T) {
 	requestID := uint32(42)
 	chainID := constants.PlatformChainID
 	// create the Chits message
-	msg, err := mc.Chits(chainID, requestID, containerIDs)
+	msg, err := mc.Chits(chainID, requestID, []ids.ID{}, containerIDs)
 	require.NoError(err)
 	// send chits to [node]
 	ok := p.Send(context.Background(), msg)

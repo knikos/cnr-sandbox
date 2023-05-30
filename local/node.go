@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
-	"path/filepath"
 	"time"
 
 	"github.com/ava-labs/avalanche-network-runner/api"
@@ -62,18 +61,23 @@ type localNode struct {
 	p2pPort uint16
 	// Returns a connection to this node
 	getConnFunc getConnFunc
+	// The data dir of the node
+	dataDir string
 	// The db dir of the node
 	dbDir string
 	// The logs dir of the node
 	logsDir string
-	// The build dir of the node
-	buildDir string
+	// The plugin dir of the node
+	pluginDir string
 	// The node config
 	config node.Config
 	// The node httpHost
 	httpHost string
 	// maps from peer ID to peer object
 	attachedPeers map[string]peer.Peer
+	// signals that the process is stopped but the information is valid
+	// and can be resumed
+	paused bool
 }
 
 func defaultGetConnFunc(ctx context.Context, node node.Node) (net.Conn, error) {
@@ -122,10 +126,6 @@ func (node *localNode) AttachPeer(ctx context.Context, router router.InboundHand
 	}
 	signerIP := ips.NewDynamicIPPort(net.IPv6zero, 0)
 	tls := tlsCert.PrivateKey.(crypto.Signer)
-	gossipTracker, err := peer.NewGossipTracker(prometheus.NewRegistry(), "anr")
-	if err != nil {
-		return nil, err
-	}
 	config := &peer.Config{
 		Metrics:              metrics,
 		MessageCreator:       mc,
@@ -141,7 +141,6 @@ func (node *localNode) AttachPeer(ctx context.Context, router router.InboundHand
 		PongTimeout:          constants.DefaultPingPongTimeout,
 		MaxClockDifference:   time.Minute,
 		ResourceTracker:      resourceTracker,
-		GossipTracker:        gossipTracker,
 		IPSigner:             peer.NewIPSigner(signerIP, tls),
 	}
 	_, conn, cert, err := clientUpgrader.Upgrade(conn)
@@ -229,11 +228,13 @@ func (node *localNode) GetBinaryPath() string {
 }
 
 // See node.Node
-func (node *localNode) GetBuildDir() string {
-	if node.buildDir == "" {
-		return filepath.Dir(node.GetBinaryPath())
-	}
-	return node.buildDir
+func (node *localNode) GetPluginDir() string {
+	return node.pluginDir
+}
+
+// See node.Node
+func (node *localNode) GetDataDir() string {
+	return node.dataDir
 }
 
 // See node.Node
@@ -282,4 +283,9 @@ func (node *localNode) GetFlag(k string) (string, error) {
 		}
 	}
 	return v, nil
+}
+
+// See node.Node
+func (node *localNode) GetPaused() bool {
+	return node.paused
 }
